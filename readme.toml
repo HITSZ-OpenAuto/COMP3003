@@ -1,33 +1,33 @@
 course_name = "计算机网络"
-repo_type = "normal"
 course_code = "COMP3003"
-
+repo_type = "normal"
 description = "哈尔滨工业大学（深圳）计算机网络课程资料。"
 
-[[lecturers]]
+[lecturers]
+
+[[lecturers.items]]
 name = "秦阳"
 
-[[lecturers.reviews]]
+[[lecturers.items.reviews]]
 content = "资历很深的老教授。"
 
-[[lecturers]]
+[[lecturers.items]]
 name = "堵宏伟"
 
-[[lecturers.reviews]]
+[[lecturers.items.reviews]]
 content = "也教《分布式系统》。"
 
-[[lecturers]]
+[[lecturers.items]]
 name = "刘圣鑫"
 
-[[lecturers.reviews]]
+[[lecturers.items.reviews]]
 content = "新入职的老师，第一次带计网。讲课很认真，会说冷笑话，很年轻，跟学生关系比较好。"
 
-[[lecturers]]
+[[lecturers.items]]
 name = "李全龙"
 
-[[lecturers.reviews]]
+[[lecturers.items.reviews]]
 content = "本部来的老师，哈工大计网 MOOC 的领头人。"
-
 
 [[sections]]
 title = "在线资源"
