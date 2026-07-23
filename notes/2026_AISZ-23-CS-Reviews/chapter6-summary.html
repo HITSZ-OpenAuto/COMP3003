@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第6章 应用层 - 计算机网络复习</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body data-storage="network-review-ch6">
+  <header class="topbar">
+    <a class="back-link" href="index.html">返回总览</a>
+    <div class="title-block">
+      <p class="eyebrow">Chapter 6</p>
+      <h1>第6章 应用层</h1>
+      <p>作业三重点: DNS 查询和资源记录、C/S 与 P2P 分发、HTTP/TCP、SMTP/MIME。</p>
+    </div>
+    <div class="progress-panel">
+      <strong id="progressText">0%</strong>
+      <span>掌握度</span>
+      <div class="progress-track"><div id="progressBar"></div></div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="" href="chapter1-summary.html">第1章</a><a class="" href="chapter2-summary.html">第2章</a><a class="" href="chapter3-summary.html">第3章</a><a class="" href="chapter4-summary.html">第4章</a><a class="" href="chapter5-summary.html">第5章</a><a class="active" href="chapter6-summary.html">第6章</a><a class="" href="chapter7-summary.html">第7章</a>
+    </nav>
+
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索本章</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 NAT、Reno、CRC">
+      </label>
+      <button id="toggleUnmastered" type="button">只看未掌握</button>
+      <button id="expandAll" type="button">展开全部</button>
+      <button id="collapseAll" type="button">收起全部</button>
+    </section>
+
+    <section class="meta-grid">
+      <article>
+        <h2>来源</h2>
+        <p>Chapter6-Application Layer-学生.pdf</p>
+      </article>
+      <article>
+        <h2>作业关联</h2>
+        <ul><li>作业三: C/S 与 P2P 文件分发时间</li><li>作业三: DNS 递归+迭代查询过程</li><li>作业三: DNS 记录 A/NS/MX</li><li>作业三: SMTP 三阶段与 MIME 附件</li></ul>
+      </article>
+      <article>
+        <h2>期末线索</h2>
+        <ul><li>填空: HTTP 无状态与 Cookie</li><li>分析: DNS 记录添加、邮件服务器解析</li><li>分析: SMTP 三阶段</li><li>分析: P2P/C/S 分发计算</li></ul>
+      </article>
+    </section>
+
+    <section class="layout">
+      <div class="main-column">
+        
+    <section class="detail-entry">
+      <div>
+        <p class="eyebrow">Deep Dive</p>
+        <h2>详细介绍页</h2>
+        <p>本章的考试细节、逐 bit 字段图、协议状态转移和作业例题已拆到单独页面，便于总结页保持清爽。</p>
+      </div>
+      <a href="chapter6-detail.html">打开第6章详细介绍</a>
+    </section>
+  
+
+        <h2>知识点总结</h2>
+        
+    <section class="topic-card" data-search="应用体系结构 客户/服务器结构中服务器常在线、地址稳定，客户端主动请求服务。 P2P 中节点直接通信，具有自扩展性，但管理更复杂，节点可能频繁上下线和改变 IP。 混合结构可让搜索/索引用 C/S，文件传输用 P2P。">
+      <button class="topic-head" type="button" aria-expanded="true">
+        <span>应用体系结构</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body open">
+        <ul><li>客户/服务器结构中服务器常在线、地址稳定，客户端主动请求服务。</li><li>P2P 中节点直接通信，具有自扩展性，但管理更复杂，节点可能频繁上下线和改变 IP。</li><li>混合结构可让搜索/索引用 C/S，文件传输用 P2P。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="应用通信原理 不同主机上的进程通过 socket 交换报文。 进程标识需要 IP 地址和端口号。 应用协议规定报文类型、语法、字段语义和交互规则。">
+      <button class="topic-head" type="button" aria-expanded="true">
+        <span>应用通信原理</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body open">
+        <ul><li>不同主机上的进程通过 socket 交换报文。</li><li>进程标识需要 IP 地址和端口号。</li><li>应用协议规定报文类型、语法、字段语义和交互规则。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="DNS DNS 是分布式层次数据库和应用层协议，完成域名到 IP 的解析，也支持主机别名、邮件服务器别名和负载均衡。 查询通常先到本地域名服务器；本地服务器无缓存时再查根、TLD、权威服务器。 递归查询是被查询服务器代替请求方继续查询；迭代查询是返回下一步应查询的服务器信息。 资源记录 RR 格式为 (name, value, type, ttl)，常见类型 A、NS、CNAME、MX。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>DNS</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>DNS 是分布式层次数据库和应用层协议，完成域名到 IP 的解析，也支持主机别名、邮件服务器别名和负载均衡。</li><li>查询通常先到本地域名服务器；本地服务器无缓存时再查根、TLD、权威服务器。</li><li>递归查询是被查询服务器代替请求方继续查询；迭代查询是返回下一步应查询的服务器信息。</li><li>资源记录 RR 格式为 (name, value, type, ttl)，常见类型 A、NS、CNAME、MX。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="FTP 与 Email FTP 使用分离的控制连接和数据连接，控制连接常用 TCP 21。 Email 系统由用户代理、邮件服务器、SMTP 和邮件读取协议组成。 SMTP 使用 TCP 可靠传输，服务器熟知端口 25，采用命令/响应交互，传输过程包括连接建立、邮件传送、连接释放。 原始 SMTP 只支持 7 位 ASCII，MIME 用于传输多媒体内容和二进制附件。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>FTP 与 Email</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>FTP 使用分离的控制连接和数据连接，控制连接常用 TCP 21。</li><li>Email 系统由用户代理、邮件服务器、SMTP 和邮件读取协议组成。</li><li>SMTP 使用 TCP 可靠传输，服务器熟知端口 25，采用命令/响应交互，传输过程包括连接建立、邮件传送、连接释放。</li><li>原始 SMTP 只支持 7 位 ASCII，MIME 用于传输多媒体内容和二进制附件。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="Web 与 HTTP HTTP 使用 TCP，服务器通常监听 80 端口；HTTP 是无状态协议。 非持久 HTTP 每个对象单独建立 TCP 连接，响应时间约 2RTT + 对象传输时间。 持久连接复用 TCP 连接，流水线持久连接可连续发送多个请求。 HTTP/2 将对象切为帧并交错传输，缓解应用层 HOL；HTTP/3 基于 QUIC/UDP，降低连接建立成本并减少队头阻塞。 Cookie 通过响应头、请求头、客户端文件和服务器数据库实现会话跟踪。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>Web 与 HTTP</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>HTTP 使用 TCP，服务器通常监听 80 端口；HTTP 是无状态协议。</li><li>非持久 HTTP 每个对象单独建立 TCP 连接，响应时间约 2RTT + 对象传输时间。</li><li>持久连接复用 TCP 连接，流水线持久连接可连续发送多个请求。</li><li>HTTP/2 将对象切为帧并交错传输，缓解应用层 HOL；HTTP/3 基于 QUIC/UDP，降低连接建立成本并减少队头阻塞。</li><li>Cookie 通过响应头、请求头、客户端文件和服务器数据库实现会话跟踪。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="Web 缓存与 P2P 分发 Web 缓存可在不访问源服务器时满足请求，降低响应时间和机构外链流量。 条件 GET 使用 If-Modified-Since，若未修改可返回 304 Not Modified。 C/S 分发瓶颈在服务器上传和最慢客户端下载。 P2P 分发还利用所有对等方上传能力，因此 N 增大时通常比 C/S 更具扩展性。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>Web 缓存与 P2P 分发</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>Web 缓存可在不访问源服务器时满足请求，降低响应时间和机构外链流量。</li><li>条件 GET 使用 If-Modified-Since，若未修改可返回 304 Not Modified。</li><li>C/S 分发瓶颈在服务器上传和最慢客户端下载。</li><li>P2P 分发还利用所有对等方上传能力，因此 N 增大时通常比 C/S 更具扩展性。</li></ul>
+      </div>
+    </section>
+  
+
+        <h2>公式与判定</h2>
+        <div class="formula-grid">
+    <article class="formula-card" data-search="C/S 分发 D_cs &gt;= max(NF/us, F/d_min) 服务器至少上传 N 份，最慢客户端下载 1 份。">
+      <div class="formula-name">C/S 分发</div>
+      <code>D_cs &gt;= max(NF/us, F/d_min)</code>
+      <p>服务器至少上传 N 份，最慢客户端下载 1 份。</p>
+    </article>
+  
+    <article class="formula-card" data-search="P2P 分发 D_p2p &gt;= max(F/us, F/d_min, NF/(us + sum ui)) 若所有 peer 上传相同 u，则 sum ui = Nu。">
+      <div class="formula-name">P2P 分发</div>
+      <code>D_p2p &gt;= max(F/us, F/d_min, NF/(us + sum ui))</code>
+      <p>若所有 peer 上传相同 u，则 sum ui = Nu。</p>
+    </article>
+  
+    <article class="formula-card" data-search="非持久 HTTP T = 2RTT + object transmission time 单个对象无 DNS 时。">
+      <div class="formula-name">非持久 HTTP</div>
+      <code>T = 2RTT + object transmission time</code>
+      <p>单个对象无 DNS 时。</p>
+    </article>
+  
+    <article class="formula-card" data-search="访问链路流量强度 aL/R Web 缓存题常用于判断排队延迟。">
+      <div class="formula-name">访问链路流量强度</div>
+      <code>aL/R</code>
+      <p>Web 缓存题常用于判断排队延迟。</p>
+    </article>
+  </div>
+
+        <h2>易错点</h2>
+        <div class="warning-box"><ul><li>在 .com TLD 中注册域名时要放 NS 记录和权威 DNS 的 A 记录。</li><li>在权威 DNS 中，Web 用 A 记录，邮件域用 MX 记录，邮件服务器名还需 A 记录。</li><li>HTTP 是 pull，SMTP 是 push。</li><li>Cookie 不是让 HTTP 变成有状态协议，而是在无状态协议上额外维护会话状态。</li><li>P2P 公式里不要漏掉服务器至少上传一份 F/us。</li></ul></div>
+
+        <h2>快速自查</h2>
+        <div class="qa-grid">
+    <article class="qa-card" data-search="C/S 分发公式是什么? Dcs &gt;= max(NF/us, F/dmin)。">
+      <button type="button" class="qa-question">C/S 分发公式是什么?</button>
+      <p class="qa-answer">Dcs &gt;= max(NF/us, F/dmin)。</p>
+    </article>
+  
+    <article class="qa-card" data-search="P2P 分发公式是什么? Dp2p &gt;= max(F/us, F/dmin, NF/(us + Σui))。">
+      <button type="button" class="qa-question">P2P 分发公式是什么?</button>
+      <p class="qa-answer">Dp2p &gt;= max(F/us, F/dmin, NF/(us + Σui))。</p>
+    </article>
+  
+    <article class="qa-card" data-search="注册 xyz.com 时 .com TLD 需要哪些记录? xyz.com 的 NS 记录，以及 dns.xyz.com 的 A 记录。">
+      <button type="button" class="qa-question">注册 xyz.com 时 .com TLD 需要哪些记录?</button>
+      <p class="qa-answer">xyz.com 的 NS 记录，以及 dns.xyz.com 的 A 记录。</p>
+    </article>
+  </div>
+      </div>
+
+      <aside class="side-panel">
+        <h2>掌握清单</h2>
+        <div class="checks">
+    <label class="check-row" data-search="能比较 C/S、P2P、混合结构。">
+      <input type="checkbox" data-check="0">
+      <span>能比较 C/S、P2P、混合结构。</span>
+    </label>
+  
+    <label class="check-row" data-search="能写出 DNS 递归+迭代查询过程。">
+      <input type="checkbox" data-check="1">
+      <span>能写出 DNS 递归+迭代查询过程。</span>
+    </label>
+  
+    <label class="check-row" data-search="能判断 A、NS、CNAME、MX 记录的 name/value。">
+      <input type="checkbox" data-check="2">
+      <span>能判断 A、NS、CNAME、MX 记录的 name/value。</span>
+    </label>
+  
+    <label class="check-row" data-search="能计算 C/S 与 P2P 最小分发时间。">
+      <input type="checkbox" data-check="3">
+      <span>能计算 C/S 与 P2P 最小分发时间。</span>
+    </label>
+  
+    <label class="check-row" data-search="能说明 SMTP 三阶段和使用 TCP/25 的原因。">
+      <input type="checkbox" data-check="4">
+      <span>能说明 SMTP 三阶段和使用 TCP/25 的原因。</span>
+    </label>
+  
+    <label class="check-row" data-search="能说明 MIME 处理非文本附件的机制。">
+      <input type="checkbox" data-check="5">
+      <span>能说明 MIME 处理非文本附件的机制。</span>
+    </label>
+  
+    <label class="check-row" data-search="能比较非持久、持久、流水线 HTTP。">
+      <input type="checkbox" data-check="6">
+      <span>能比较非持久、持久、流水线 HTTP。</span>
+    </label>
+  
+    <label class="check-row" data-search="能解释 Web 缓存、条件 GET、Cookie。">
+      <input type="checkbox" data-check="7">
+      <span>能解释 Web 缓存、条件 GET、Cookie。</span>
+    </label>
+  </div>
+        <h2>我的补充</h2>
+        <textarea id="notes" placeholder="把你根据作业补充的题型、错因或例题写在这里。"></textarea>
+        <button id="copySummary" type="button">复制复习清单</button>
+        <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+const key = document.body.dataset.storage || "network-review";
+const state = JSON.parse(localStorage.getItem(key) || "{}");
+const checks = [...document.querySelectorAll("[data-check]")];
+const notes = document.getElementById("notes");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+let onlyUnmastered = false;
+
+function save() {
+  const mastered = checks.map((input) => input.checked);
+  localStorage.setItem(key, JSON.stringify({ mastered, notes: notes?.value || "" }));
+}
+
+function updateProgress() {
+  const done = checks.filter((input) => input.checked).length;
+  const total = checks.length || 1;
+  const percent = Math.round((done / total) * 100);
+  if (progressText) progressText.textContent = percent + "%";
+  if (progressBar) progressBar.style.width = percent + "%";
+  checks.forEach((input) => {
+    const row = input.closest(".check-row");
+    row?.classList.toggle("mastered", input.checked);
+    if (onlyUnmastered) row.hidden = input.checked;
+  });
+}
+
+checks.forEach((input, index) => {
+  input.checked = Boolean(state.mastered?.[index]);
+  input.addEventListener("change", () => {
+    save();
+    updateProgress();
+  });
+});
+if (notes) {
+  notes.value = state.notes || "";
+  notes.addEventListener("input", save);
+}
+updateProgress();
+
+document.querySelectorAll(".topic-head").forEach((button) => {
+  button.addEventListener("click", () => {
+    const body = button.parentElement.querySelector(".topic-body");
+    const isOpen = body.classList.toggle("open");
+    button.setAttribute("aria-expanded", String(isOpen));
+  });
+});
+
+document.querySelectorAll(".qa-question").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.parentElement.querySelector(".qa-answer")?.classList.toggle("open");
+  });
+});
+
+document.getElementById("expandAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.add("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "true"));
+});
+
+document.getElementById("collapseAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.remove("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "false"));
+});
+
+document.getElementById("toggleUnmastered")?.addEventListener("click", (event) => {
+  onlyUnmastered = !onlyUnmastered;
+  event.currentTarget.classList.toggle("active", onlyUnmastered);
+  updateProgress();
+});
+
+document.getElementById("searchInput")?.addEventListener("input", (event) => {
+  const q = event.target.value.trim().toLowerCase();
+  document.querySelectorAll("[data-search]").forEach((node) => {
+    node.hidden = q && !node.dataset.search.toLowerCase().includes(q);
+  });
+});
+
+document.getElementById("copySummary")?.addEventListener("click", async () => {
+  const pending = checks
+    .filter((input) => !input.checked)
+    .map((input) => "- " + input.closest(".check-row").innerText.trim())
+    .join("\n");
+  const text = [
+    document.querySelector("h1")?.innerText || "计算机网络复习",
+    "",
+    "未掌握清单:",
+    pending || "- 已全部勾选",
+    "",
+    "我的补充:",
+    notes?.value || ""
+  ].join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+  } catch {
+    document.getElementById("copyStatus").textContent = "浏览器限制复制，请手动选择文本。";
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter 2 物理层 - 交互复习</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #d8e0eb;
+      --paper: #fbfcff;
+      --blue: #1d4ed8;
+      --cyan: #047c91;
+      --green: #15803d;
+      --amber: #b45309;
+      --rose: #be123c;
+      --violet: #6d28d9;
+      --soft-blue: #eaf2ff;
+      --soft-cyan: #e7f7f9;
+      --soft-green: #eaf8ee;
+      --soft-amber: #fff4df;
+      --soft-rose: #ffe8ee;
+      --shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f7fbff 0%, #eef5f7 52%, #fbfcff 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+    }
+
+    button, input, textarea { font: inherit; }
+    h1, h2, h3 { margin: 0; line-height: 1.2; letter-spacing: 0; }
+    h1 { font-size: clamp(30px, 4.5vw, 52px); max-width: 900px; }
+    h2 { font-size: 24px; margin-bottom: 14px; }
+    h3 { font-size: 17px; margin-bottom: 8px; }
+    p { margin: 0; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 22px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      overflow: auto;
+    }
+
+    main { padding: 26px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border-radius: 8px;
+      font-weight: 800;
+    }
+
+    .mini { color: var(--muted); font-size: 14px; }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .nav a {
+      color: var(--ink);
+      text-decoration: none;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    .nav a:hover, .nav a:focus {
+      border-color: var(--line);
+      background: #f6f9fc;
+      outline: none;
+    }
+
+    .meter {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      background: #e8edf5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      transition: width 200ms ease;
+    }
+
+    section {
+      max-width: 1180px;
+      margin: 0 auto 24px;
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      min-height: 330px;
+      display: grid;
+      align-content: center;
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(29, 78, 216, 0.92), rgba(4, 124, 145, 0.76)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1300' height='680' viewBox='0 0 1300 680'%3E%3Crect width='1300' height='680' fill='%230a1020'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.20' stroke-width='3'%3E%3Cpath d='M70 220H1220'/%3E%3Cpath d='M110 310 C260 120 380 510 560 310 S870 90 1160 360'/%3E%3Cpath d='M120 500 C310 380 440 590 650 460 S950 330 1210 520'/%3E%3Cpath d='M240 95V580 M510 90V585 M780 95V580 M1050 105V560'/%3E%3C/g%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='110' cy='310' r='11'/%3E%3Ccircle cx='240' cy='220' r='13'/%3E%3Ccircle cx='510' cy='310' r='13'/%3E%3Ccircle cx='780' cy='460' r='12'/%3E%3Ccircle cx='1050' cy='220' r='13'/%3E%3Ccircle cx='1160' cy='520' r='11'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      box-shadow: none;
+    }
+
+    .subtitle {
+      max-width: 840px;
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 18px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      background: rgba(255, 255, 255, 0.17);
+      color: inherit;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .blue { background: var(--soft-blue); }
+    .cyan { background: var(--soft-cyan); }
+    .green { background: var(--soft-green); }
+    .amber { background: var(--soft-amber); }
+    .rose { background: var(--soft-rose); }
+
+    .formula {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #101828;
+      color: #eef6ff;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+    }
+
+    .btn.good {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: white;
+    }
+
+    .btn:hover { filter: brightness(0.98); }
+    .btn:focus, input:focus, textarea:focus {
+      outline: 3px solid rgba(29, 78, 216, 0.22);
+      outline-offset: 2px;
+    }
+
+    .calc {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .result {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 52px;
+    }
+
+    .pill-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pill.selected { background: var(--soft-blue); border-color: var(--blue); color: var(--blue); }
+    .pill.correct { background: #dcfce7; border-color: var(--green); color: var(--green); }
+    .pill.wrong { background: #ffe4e6; border-color: var(--rose); color: var(--rose); }
+
+    .match-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .match-item {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .answer {
+      min-height: 38px;
+      border: 1px dashed #9aa8bb;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 7px 10px;
+      color: var(--muted);
+    }
+
+    .quiz-item {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .option.selected { border-color: var(--blue); background: var(--soft-blue); }
+    .option.correct { border-color: var(--green); background: #ecfdf3; }
+    .option.wrong { border-color: var(--rose); background: #fff1f2; }
+
+    .feedback {
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .review-plan {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .review-plan-item {
+      border-left: 4px solid var(--blue);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .review-plan-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .copybox, .note {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      color: var(--ink);
+      resize: vertical;
+    }
+
+    .copybox {
+      min-height: 92px;
+      margin-top: 12px;
+    }
+
+    .note { min-height: 110px; }
+    .status { margin-top: 10px; color: var(--muted); min-height: 24px; }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      aside {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      main { padding: 14px; }
+      section { padding: 20px; }
+      .grid, .two, .calc { grid-template-columns: 1fr; }
+      .match-item { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="mark">PHY</div>
+        <div>
+          <strong>计算机网络</strong>
+          <p class="mini">Chapter 2 复习板</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="章节导航">
+        <a href="#map">考点地图</a>
+        <a href="#formula">公式训练</a>
+        <a href="#multiplex">复用配对</a>
+        <a href="#encoding">编码调制</a>
+        <a href="#quiz">诊断测验</a>
+        <a href="#notes">错题记录</a>
+      </nav>
+      <div class="meter">
+        <strong>本页完成度</strong>
+        <div class="bar" aria-hidden="true"><span id="progressBar"></span></div>
+        <p class="mini" id="progressText">0 / 5 个模块</p>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <h1>第 2 章 物理层</h1>
+        <p class="subtitle">按课件与作业一整理：比特流传输、数据通信术语、信道容量、复用、基带与频带传输、物理层设备。</p>
+        <div class="tag-row">
+          <span class="tag">Rb = RB log2 M</span>
+          <span class="tag">Nyquist: C = 2B log2 M</span>
+          <span class="tag">Shannon: C = B log2(1+S/N)</span>
+          <span class="tag">FDM / TDM / WDM / CDM</span>
+          <span class="tag">Manchester / QAM</span>
+        </div>
+      </section>
+
+      <section id="map">
+        <h2>考点地图</h2>
+        <div class="grid">
+          <article class="card blue">
+            <h3>2.1 物理层功能</h3>
+            <p>在物理介质上传输比特流，涉及比特编码、数据率、比特同步、接口特性与传输模式。</p>
+          </article>
+          <article class="card cyan">
+            <h3>2.2 数据通信基础</h3>
+            <p>信源、发送设备、信道、接收设备、信宿构成通信系统。PCM 的步骤是采样、量化、编码。</p>
+          </article>
+          <article class="card green">
+            <h3>2.3 物理介质</h3>
+            <p>导引型介质包括双绞线、同轴电缆、光纤；非导引型介质是自由空间中的无线传播。</p>
+          </article>
+          <article class="card amber">
+            <h3>2.4 信道容量</h3>
+            <p>奈奎斯特用于理想无噪声信道；香农用于有噪声信道。注意 dB 与线性信噪比转换。</p>
+          </article>
+          <article class="card rose">
+            <h3>2.5 信道共享</h3>
+            <p>FDM 划分频率，TDM 划分时间，WDM 是光的频分复用，CDM 用正交码片序列共享同频资源。</p>
+          </article>
+          <article class="card">
+            <h3>作业一锚点</h3>
+            <p>波特率题对应本章多进制调制：比特率 Rb、波特率 RB、进制数 M 的关系是 Rb = RB log2 M。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="formula">
+        <h2>公式训练</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>比特率与波特率</h3>
+            <div class="formula">Rb = RB log2 M</div>
+            <div class="calc">
+              <label>比特率 Rb (bps)<input id="bitRate" type="number" value="2400"></label>
+              <label>进制数 M<input id="symbolM" type="number" value="4"></label>
+              <label>波特率 RB (Baud)<input id="baudRate" type="number" value="1200"></label>
+              <label>方向 1 或 2<input id="baudMode" type="number" value="1"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcBaud" title="计算">= 计算</button>
+              <button class="btn good" data-complete="formula" title="标记完成">✓ 掌握公式</button>
+            </div>
+            <div class="result" id="baudResult"></div>
+          </div>
+          <div class="card">
+            <h3>PCM 速率</h3>
+            <div class="formula">Rb = fs log2 N</div>
+            <div class="calc">
+              <label>采样率 fs (Hz)<input id="sampleRate" type="number" value="8000"></label>
+              <label>量化级数 N<input id="quantLevels" type="number" value="256"></label>
+              <label>声道数<input id="channels" type="number" value="1"></label>
+              <label>保留项<input id="pcmSpare" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcPcm" title="计算">= 计算</button>
+            </div>
+            <div class="result" id="pcmResult"></div>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:14px;">
+          <div class="card">
+            <h3>奈奎斯特容量</h3>
+            <div class="formula">C = 2B log2 M</div>
+            <div class="calc">
+              <label>带宽 B (Hz)<input id="nyquistB" type="number" value="3000"></label>
+              <label>信号状态数 M<input id="nyquistM" type="number" value="16"></label>
+              <label>预留<input id="nyquistSpare1" type="number" value="0"></label>
+              <label>预留<input id="nyquistSpare2" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcNyquist" title="计算">= 计算</button>
+            </div>
+            <div class="result" id="nyquistResult"></div>
+          </div>
+          <div class="card">
+            <h3>香农容量</h3>
+            <div class="formula">C = B log2(1 + S/N), SNR = 10^(dB/10)</div>
+            <div class="calc">
+              <label>带宽 B (Hz)<input id="shannonB" type="number" value="2000000"></label>
+              <label>信噪比 (dB)<input id="snrDb" type="number" value="30"></label>
+              <label>预留<input id="shannonSpare1" type="number" value="0"></label>
+              <label>预留<input id="shannonSpare2" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcShannon" title="计算">= 计算</button>
+            </div>
+            <div class="result" id="shannonResult"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="multiplex">
+        <h2>复用配对</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>方式与资源片</h3>
+            <div class="pill-bank" id="muxBank"></div>
+            <div class="pill-bank" id="resourceBank"></div>
+            <div class="match-list" id="muxMatchList"></div>
+            <div class="toolbar">
+              <button class="btn primary" id="checkMux" title="检查">✓ 检查</button>
+              <button class="btn" id="resetMux" title="重置">↺ 重置</button>
+              <button class="btn good" data-complete="multiplex" title="标记完成">✓ 掌握复用</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>CDM 码片</h3>
+            <p>发送 1 使用原码片序列，发送 0 使用反码；接收端用本用户码片序列与叠加信号做内积恢复数据。</p>
+            <div class="formula">encoded = d × S, d ∈ {+1, -1}</div>
+            <div class="calc">
+              <label>数据 d (+1/-1)<input id="cdmData" type="number" value="1"></label>
+              <label>码片序列 S<input id="cdmChip" type="text" value="-1,-1,-1,1,1,-1,1,1"></label>
+              <label>预留<input id="cdmSpare1" type="number" value="0"></label>
+              <label>预留<input id="cdmSpare2" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcCdm" title="编码">= 编码</button>
+            </div>
+            <div class="result" id="cdmResult"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="encoding">
+        <h2>编码调制</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>曼彻斯特码</h3>
+            <p>每个比特周期中间必有跳变；高到低表示 1，低到高表示 0。10 Mbps 以太网采用曼彻斯特码。</p>
+          </article>
+          <article class="card">
+            <h3>差分曼彻斯特码</h3>
+            <p>每个比特周期中间跳变只用于同步；比特开始处有跳变表示 0，无跳变表示 1。</p>
+          </article>
+          <article class="card">
+            <h3>4B5B</h3>
+            <p>nBmB 中 m 大于 n，从更多码组中选择有效码，其余作为禁用码用于同步与检错。</p>
+          </article>
+          <article class="card">
+            <h3>2ASK / 2FSK / 2PSK</h3>
+            <p>ASK 控制幅值，FSK 控制频率，PSK 控制相位。相同信噪比下 2PSK 误码率最低，2ASK 最高。</p>
+          </article>
+          <article class="card">
+            <h3>QAM</h3>
+            <p>幅值和相位联合键控，又称 APK；星座点位于 I-Q 平面，优点是频带利用率高、抗噪声能力强。</p>
+          </article>
+          <article class="card">
+            <h3>物理层设备</h3>
+            <p>中继器负责比特再生；集线器是多端口中继器，所有端口内部物理连通。</p>
+          </article>
+        </div>
+        <div class="card" style="margin-top:14px;">
+          <h3>曼彻斯特文本编码</h3>
+          <div class="calc">
+            <label>比特序列<input id="manBits" type="text" value="1100100111"></label>
+            <label>高到低记号<input id="hiLo" type="text" value="HL"></label>
+            <label>低到高记号<input id="loHi" type="text" value="LH"></label>
+            <label>预留<input id="manSpare" type="number" value="0"></label>
+          </div>
+          <div class="toolbar">
+            <button class="btn primary" id="encodeManchester" title="编码">= 编码</button>
+            <button class="btn good" data-complete="encoding" title="标记完成">✓ 掌握编码</button>
+          </div>
+          <div class="result" id="manResult"></div>
+        </div>
+      </section>
+
+      <section id="quiz">
+        <h2>诊断测验</h2>
+        <div id="quizBox"></div>
+        <div class="toolbar">
+          <button class="btn primary" id="scoreQuiz" title="评分">✓ 评分</button>
+          <button class="btn" id="resetQuiz" title="重做">↺ 重做</button>
+          <button class="btn" id="appendQuizNotes" title="加入错题记录">＋ 加入错题记录</button>
+          <button class="btn" id="copyQuizSummary" title="复制摘要">⧉ 复制摘要</button>
+          <button class="btn good" data-complete="quiz" title="标记完成">✓ 完成测验</button>
+        </div>
+        <div class="result" id="quizResult"></div>
+        <textarea class="copybox" id="quizSummary" readonly placeholder="评分后这里会生成反馈摘要。"></textarea>
+      </section>
+
+      <section id="notes">
+        <h2>错题记录</h2>
+        <textarea class="note" id="notesBox" placeholder="把不稳的题号、公式、概念写在这里。"></textarea>
+        <div class="toolbar">
+          <button class="btn primary" id="saveNotes" title="保存到浏览器">↓ 保存</button>
+          <button class="btn" id="clearNotes" title="清空记录">× 清空</button>
+        </div>
+        <p class="status" id="noteStatus"></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const muxPairs = [
+      ["FDM", "频率带宽"],
+      ["TDM", "时间时隙"],
+      ["WDM", "光波长"],
+      ["CDM", "码片序列"]
+    ];
+
+    const quiz = [
+      {
+        q: "物理层最基本的功能是什么？",
+        options: ["进程间可靠传输", "在物理介质上传输比特流", "选择端到端路由", "解析域名"],
+        answer: 1,
+        topic: "物理层功能",
+        why: "物理层向数据链路层提供比特流传输能力。"
+      },
+      {
+        q: "PCM 的三个基本步骤是？",
+        options: ["采样、量化、编码", "路由、转发、封装", "同步、复用、拥塞控制", "调制、解调、重传"],
+        answer: 0,
+        topic: "数据通信基础",
+        why: "PCM 用采样完成时间离散化，用量化完成取值离散化，再编码成二进制。"
+      },
+      {
+        q: "理想无噪声信道的容量公式是？",
+        options: ["C = B log2(1+S/N)", "C = 2B log2M", "Rb = RB log2M", "d = s/t"],
+        answer: 1,
+        topic: "信道容量",
+        why: "奈奎斯特公式用于理想无噪声信道。"
+      },
+      {
+        q: "有噪声信道容量通常用哪个公式？",
+        options: ["香农公式", "CRC 公式", "曼彻斯特公式", "GBN 公式"],
+        answer: 0,
+        topic: "信道容量",
+        why: "香农公式 C = B log2(1+S/N)。"
+      },
+      {
+        q: "作业一中 2400 bps、4 进制调制时，波特率是多少？",
+        options: ["600 Baud", "1200 Baud", "2400 Baud", "4800 Baud"],
+        answer: 1,
+        topic: "波特率计算",
+        why: "RB = Rb/log2M = 2400/2 = 1200 Baud。"
+      },
+      {
+        q: "FDM 与 TDM 的核心区别是？",
+        options: ["前者分频率，后者分时间", "前者分时间，后者分波长", "前者用码片，后者用 IP 地址", "二者都只用于光纤"],
+        answer: 0,
+        topic: "多路复用",
+        why: "FDM 各用户占用不同频带，TDM 各用户周期性占用时隙。"
+      },
+      {
+        q: "WDM 可以理解为？",
+        options: ["光的频分复用", "无线的时分复用", "IP 的地址复用", "应用层的端口复用"],
+        answer: 0,
+        topic: "多路复用",
+        why: "WDM 在光纤中按不同波长复用信号。"
+      },
+      {
+        q: "曼彻斯特码中，课件规则里的高到低跳变表示？",
+        options: ["0", "1", "空闲", "冲突"],
+        answer: 1,
+        topic: "基带编码",
+        why: "课件给出正电平到负电平表示 1，负到正表示 0。"
+      },
+      {
+        q: "2ASK、2FSK、2PSK 分别控制载波的什么参数？",
+        options: ["幅值、频率、相位", "频率、幅值、相位", "相位、频率、幅值", "幅值、相位、频率"],
+        answer: 0,
+        topic: "频带调制",
+        why: "ASK 是幅移键控，FSK 是频移键控，PSK 是相移键控。"
+      },
+      {
+        q: "中继器和集线器工作在五层模型的哪一层？",
+        options: ["应用层", "传输层", "网络层", "物理层"],
+        answer: 3,
+        topic: "物理层设备",
+        why: "中继器进行比特再生，集线器是多端口中继器。"
+      }
+    ];
+
+    const reviewAdvice = {
+      "物理层功能": "用一句话锁定物理层职责：在介质上传输比特流；再列出接口、同步、编码、数据率四类关键词。",
+      "数据通信基础": "重画通信系统五部分，并把 PCM 的采样、量化、编码分别对应到时间离散、取值离散、二进制表示。",
+      "信道容量": "分清奈奎斯特与香农：无噪声看 M，有噪声看 S/N；练一次 dB 转线性信噪比。",
+      "波特率计算": "回做作业一第 2 题，固定模板：先算 log2M，再用 Rb/RB 互推。",
+      "多路复用": "用一张表记 FDM、TDM、WDM、CDM 的资源片：频率、时间、波长、码片序列。",
+      "基带编码": "重点记曼彻斯特和差分曼彻斯特的跳变位置与含义，不要把同步跳变和信息跳变混在一起。",
+      "频带调制": "把 2ASK/2FSK/2PSK 对应到幅值/频率/相位，再记性能排序：2PSK 抗噪最好，2ASK 最差。",
+      "物理层设备": "把中继器、集线器与交换机、路由器区分开：前两者只处理比特层面。"
+    };
+
+    let selectedMux = null;
+    let lastQuizReport = "";
+    const muxMatches = {};
+    const completed = new Set(JSON.parse(localStorage.getItem("cn-ch2-complete") || "[]"));
+
+    function log2(value) {
+      return Math.log(value) / Math.log(2);
+    }
+
+    function formatRate(rate) {
+      if (!Number.isFinite(rate)) return "输入值不完整";
+      const abs = Math.abs(rate);
+      if (abs >= 1e9) return `${(rate / 1e9).toFixed(3)} Gb/s`;
+      if (abs >= 1e6) return `${(rate / 1e6).toFixed(3)} Mb/s`;
+      if (abs >= 1e3) return `${(rate / 1e3).toFixed(3)} kb/s`;
+      return `${rate.toFixed(3)} b/s`;
+    }
+
+    function markProgress() {
+      const total = 5;
+      const done = completed.size;
+      document.getElementById("progressBar").style.width = `${Math.min(100, done / total * 100)}%`;
+      document.getElementById("progressText").textContent = `${done} / ${total} 个模块`;
+      localStorage.setItem("cn-ch2-complete", JSON.stringify([...completed]));
+    }
+
+    function renderMux() {
+      document.getElementById("muxBank").innerHTML = muxPairs.map(([mux]) => `<button class="pill" data-mux="${mux}">${mux}</button>`).join("");
+      document.getElementById("resourceBank").innerHTML = muxPairs.map(([, resource]) => `<button class="pill" data-resource="${resource}">${resource}</button>`).join("");
+      document.getElementById("muxMatchList").innerHTML = muxPairs.map(([mux]) => {
+        const answer = muxMatches[mux] || "未配对";
+        return `<div class="match-item"><strong>${mux}</strong><div class="answer" data-answer-for="${mux}">${answer}</div></div>`;
+      }).join("");
+    }
+
+    function renderQuiz() {
+      document.getElementById("quizBox").innerHTML = quiz.map((item, idx) => `
+        <div class="quiz-item" data-idx="${idx}">
+          <strong>${idx + 1}. ${item.q}</strong>
+          <div class="options">
+            ${item.options.map((option, optIdx) => `<button class="option" data-option="${optIdx}">${option}</button>`).join("")}
+          </div>
+          <p class="feedback"></p>
+        </div>
+      `).join("");
+    }
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target.matches("[data-complete]")) {
+        completed.add(target.dataset.complete);
+        markProgress();
+      }
+      if (target.matches("[data-mux]")) {
+        selectedMux = target.dataset.mux;
+        document.querySelectorAll("[data-mux]").forEach(btn => btn.classList.toggle("selected", btn === target));
+      }
+      if (target.matches("[data-resource]") && selectedMux) {
+        muxMatches[selectedMux] = target.dataset.resource;
+        selectedMux = null;
+        renderMux();
+      }
+      if (target.matches(".option")) {
+        const item = target.closest(".quiz-item");
+        item.dataset.chosen = target.dataset.option;
+        item.querySelectorAll(".option").forEach(btn => btn.classList.remove("selected"));
+        target.classList.add("selected");
+      }
+    });
+
+    document.getElementById("calcBaud").addEventListener("click", () => {
+      const rb = Number(document.getElementById("bitRate").value);
+      const m = Number(document.getElementById("symbolM").value);
+      const rbSymbol = Number(document.getElementById("baudRate").value);
+      const mode = Number(document.getElementById("baudMode").value);
+      const bitsPerSymbol = log2(m);
+      const result = mode === 2 ? rbSymbol * bitsPerSymbol : rb / bitsPerSymbol;
+      const label = mode === 2 ? "比特率 Rb" : "波特率 RB";
+      document.getElementById("baudResult").textContent =
+        `${label} = ${formatRate(result)}。每个码元携带 log2(${m}) = ${bitsPerSymbol.toFixed(3)} bit。方向 1 表示由 Rb 求 RB，方向 2 表示由 RB 求 Rb。`;
+    });
+
+    document.getElementById("calcPcm").addEventListener("click", () => {
+      const fs = Number(document.getElementById("sampleRate").value);
+      const levels = Number(document.getElementById("quantLevels").value);
+      const channels = Number(document.getElementById("channels").value);
+      const bits = log2(levels);
+      const rate = fs * bits * channels;
+      document.getElementById("pcmResult").textContent =
+        `PCM 速率 = ${formatRate(rate)}。每个采样值编码 ${bits.toFixed(3)} bit，声道数 ${channels}。`;
+    });
+
+    document.getElementById("calcNyquist").addEventListener("click", () => {
+      const b = Number(document.getElementById("nyquistB").value);
+      const m = Number(document.getElementById("nyquistM").value);
+      const c = 2 * b * log2(m);
+      document.getElementById("nyquistResult").textContent =
+        `理想无噪声容量 C = ${formatRate(c)}。例如 3 kHz、16 状态时为 24 kb/s。`;
+    });
+
+    document.getElementById("calcShannon").addEventListener("click", () => {
+      const b = Number(document.getElementById("shannonB").value);
+      const db = Number(document.getElementById("snrDb").value);
+      const snr = Math.pow(10, db / 10);
+      const c = b * log2(1 + snr);
+      document.getElementById("shannonResult").textContent =
+        `线性 S/N = ${snr.toFixed(3)}，香农容量 C = ${formatRate(c)}。`;
+    });
+
+    document.getElementById("calcCdm").addEventListener("click", () => {
+      const d = Number(document.getElementById("cdmData").value);
+      const chips = document.getElementById("cdmChip").value.split(",").map(item => Number(item.trim())).filter(Number.isFinite);
+      const encoded = chips.map(value => d * value);
+      document.getElementById("cdmResult").textContent =
+        `编码输出：${encoded.join(", ")}。发送 1 用原码片，发送 0 用反码。`;
+    });
+
+    document.getElementById("encodeManchester").addEventListener("click", () => {
+      const bits = document.getElementById("manBits").value.replace(/[^01]/g, "");
+      const hiLo = document.getElementById("hiLo").value || "HL";
+      const loHi = document.getElementById("loHi").value || "LH";
+      const encoded = bits.split("").map(bit => bit === "1" ? hiLo : loHi).join(" ");
+      document.getElementById("manResult").textContent =
+        `曼彻斯特序列：${encoded || "请输入 0/1 序列"}。1 为高到低，0 为低到高。`;
+    });
+
+    document.getElementById("checkMux").addEventListener("click", () => {
+      document.querySelectorAll("[data-answer-for]").forEach(el => {
+        const mux = el.dataset.answerFor;
+        const expected = muxPairs.find(pair => pair[0] === mux)[1];
+        el.classList.remove("correct", "wrong");
+        el.classList.add(muxMatches[mux] === expected ? "correct" : "wrong");
+      });
+    });
+
+    document.getElementById("resetMux").addEventListener("click", () => {
+      Object.keys(muxMatches).forEach(key => delete muxMatches[key]);
+      selectedMux = null;
+      renderMux();
+    });
+
+    document.getElementById("scoreQuiz").addEventListener("click", () => {
+      let score = 0;
+      const missed = [];
+      const weakTopics = {};
+      document.querySelectorAll(".quiz-item").forEach((item, idx) => {
+        const chosen = Number(item.dataset.chosen);
+        const correct = quiz[idx].answer;
+        item.querySelectorAll(".option").forEach(btn => {
+          const opt = Number(btn.dataset.option);
+          btn.classList.remove("correct", "wrong");
+          if (opt === correct) btn.classList.add("correct");
+          if (opt === chosen && opt !== correct) btn.classList.add("wrong");
+        });
+        if (chosen === correct) score += 1;
+        if (chosen !== correct) {
+          missed.push(idx + 1);
+          weakTopics[quiz[idx].topic] = (weakTopics[quiz[idx].topic] || 0) + 1;
+        }
+        item.querySelector(".feedback").textContent = quiz[idx].why;
+      });
+      const topicOrder = Object.entries(weakTopics).sort((a, b) => b[1] - a[1]).map(([topic]) => topic);
+      const weak = score >= 8 ? "第二章基础比较稳，后续重点提速公式题。" : score >= 6 ? "概念大体可用，公式和编码还要回刷。" : "先把公式、复用、编码三块重新过一遍。";
+      const plan = topicOrder.length
+        ? topicOrder.map((topic, idx) => `<div class="review-plan-item"><strong>${idx + 1}. ${topic}</strong><p>${reviewAdvice[topic]}</p></div>`).join("")
+        : `<div class="review-plan-item"><strong>进入 Chapter 3 前的保持练习</strong><p>任选两个公式计算器改参数验算，再默写 FDM/TDM/WDM/CDM 的资源片。</p></div>`;
+      lastQuizReport = [
+        `Chapter 2 自测：${score}/${quiz.length}`,
+        `错题：${missed.length ? missed.join(", ") : "无"}`,
+        `薄弱主题：${topicOrder.length ? topicOrder.join("、") : "无明显薄弱主题"}`,
+        `建议：${topicOrder.length ? topicOrder.map(topic => `${topic}: ${reviewAdvice[topic]}`).join(" | ") : "保持公式、复用和编码的快速回忆。"}`
+      ].join("\n");
+      document.getElementById("quizResult").innerHTML = `得分 ${score} / ${quiz.length}。${weak}<div class="review-plan">${plan}</div>`;
+      document.getElementById("quizSummary").value = lastQuizReport;
+    });
+
+    document.getElementById("resetQuiz").addEventListener("click", () => {
+      renderQuiz();
+      document.getElementById("quizResult").textContent = "";
+      document.getElementById("quizSummary").value = "";
+      lastQuizReport = "";
+    });
+
+    const notesBox = document.getElementById("notesBox");
+    notesBox.value = localStorage.getItem("cn-ch2-notes") || "";
+
+    document.getElementById("saveNotes").addEventListener("click", () => {
+      localStorage.setItem("cn-ch2-notes", notesBox.value);
+      document.getElementById("noteStatus").textContent = "已保存。";
+    });
+
+    document.getElementById("clearNotes").addEventListener("click", () => {
+      notesBox.value = "";
+      localStorage.removeItem("cn-ch2-notes");
+      document.getElementById("noteStatus").textContent = "已清空。";
+    });
+
+    document.getElementById("appendQuizNotes").addEventListener("click", () => {
+      if (!lastQuizReport) {
+        document.getElementById("quizSummary").value = "请先评分，再加入错题记录。";
+        return;
+      }
+      const prefix = notesBox.value.trim() ? "\n\n" : "";
+      notesBox.value += `${prefix}${lastQuizReport}`;
+      localStorage.setItem("cn-ch2-notes", notesBox.value);
+      document.getElementById("noteStatus").textContent = "已加入错题记录。";
+    });
+
+    document.getElementById("copyQuizSummary").addEventListener("click", async () => {
+      if (!lastQuizReport) {
+        document.getElementById("quizSummary").value = "请先评分，再复制摘要。";
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(lastQuizReport);
+        document.getElementById("quizSummary").value = `${lastQuizReport}\n\n已复制。`;
+      } catch (error) {
+        document.getElementById("quizSummary").value = `${lastQuizReport}\n\n复制受限时，可手动选中这段摘要。`;
+        document.getElementById("quizSummary").select();
+      }
+    });
+
+    renderMux();
+    renderQuiz();
+    markProgress();
+    document.getElementById("calcBaud").click();
+    document.getElementById("calcPcm").click();
+    document.getElementById("calcNyquist").click();
+    document.getElementById("calcShannon").click();
+    document.getElementById("calcCdm").click();
+    document.getElementById("encodeManchester").click();
+  </script>
+</body>
+</html>

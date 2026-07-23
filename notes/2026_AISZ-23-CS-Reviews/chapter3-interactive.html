@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter 3 数据链路层与局域网 - 交互复习</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #d8e0eb;
+      --blue: #1d4ed8;
+      --teal: #0f766e;
+      --green: #15803d;
+      --amber: #b45309;
+      --rose: #be123c;
+      --violet: #6d28d9;
+      --soft-blue: #eaf2ff;
+      --soft-teal: #e6f5f2;
+      --soft-green: #eaf8ee;
+      --soft-amber: #fff4df;
+      --soft-rose: #ffe8ee;
+      --shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f8fbff 0%, #eef5f0 50%, #fbfcff 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+    }
+
+    button, input, textarea { font: inherit; }
+    h1, h2, h3 { margin: 0; line-height: 1.2; letter-spacing: 0; }
+    h1 { font-size: clamp(30px, 4.5vw, 52px); max-width: 920px; }
+    h2 { font-size: 24px; margin-bottom: 14px; }
+    h3 { font-size: 17px; margin-bottom: 8px; }
+    p { margin: 0; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 278px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 22px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      overflow: auto;
+    }
+
+    main { padding: 26px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      border-radius: 8px;
+      font-weight: 800;
+    }
+
+    .mini { color: var(--muted); font-size: 14px; }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .nav a {
+      color: var(--ink);
+      text-decoration: none;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    .nav a:hover, .nav a:focus {
+      border-color: var(--line);
+      background: #f6f9fc;
+      outline: none;
+    }
+
+    .meter {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      background: #e8edf5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--blue));
+      transition: width 200ms ease;
+    }
+
+    section {
+      max-width: 1180px;
+      margin: 0 auto 24px;
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      min-height: 330px;
+      display: grid;
+      align-content: center;
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(29, 78, 216, 0.90), rgba(15, 118, 110, 0.78)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1300' height='680' viewBox='0 0 1300 680'%3E%3Crect width='1300' height='680' fill='%230b1020'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.20' stroke-width='3'%3E%3Cpath d='M80 150H1220 M80 330H1220 M80 510H1220'/%3E%3Cpath d='M180 100V570 M430 100V570 M680 100V570 M930 100V570 M1160 100V570'/%3E%3Cpath d='M180 150 C300 250 320 250 430 330 S570 520 680 510 S820 135 930 150 S1070 330 1160 330'/%3E%3C/g%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='180' cy='150' r='11'/%3E%3Ccircle cx='430' cy='330' r='13'/%3E%3Ccircle cx='680' cy='510' r='13'/%3E%3Ccircle cx='930' cy='150' r='12'/%3E%3Ccircle cx='1160' cy='330' r='11'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      box-shadow: none;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 18px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      background: rgba(255, 255, 255, 0.17);
+      color: inherit;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .blue { background: var(--soft-blue); }
+    .teal { background: var(--soft-teal); }
+    .green { background: var(--soft-green); }
+    .amber { background: var(--soft-amber); }
+    .rose { background: var(--soft-rose); }
+
+    .formula {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #101828;
+      color: #eef6ff;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+    }
+
+    .btn.good {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: white;
+    }
+
+    .btn:hover { filter: brightness(0.98); }
+    .btn:focus, input:focus, textarea:focus {
+      outline: 3px solid rgba(29, 78, 216, 0.22);
+      outline-offset: 2px;
+    }
+
+    .calc {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .result {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 52px;
+    }
+
+    .pill-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pill.selected { background: var(--soft-blue); border-color: var(--blue); color: var(--blue); }
+    .pill.correct { background: #dcfce7; border-color: var(--green); color: var(--green); }
+    .pill.wrong { background: #ffe4e6; border-color: var(--rose); color: var(--rose); }
+
+    .match-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .match-item {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .answer {
+      min-height: 38px;
+      border: 1px dashed #9aa8bb;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 7px 10px;
+      color: var(--muted);
+    }
+
+    .quiz-item {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .option.selected { border-color: var(--blue); background: var(--soft-blue); }
+    .option.correct { border-color: var(--green); background: #ecfdf3; }
+    .option.wrong { border-color: var(--rose); background: #fff1f2; }
+
+    .feedback {
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .review-plan {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .review-plan-item {
+      border-left: 4px solid var(--blue);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .review-plan-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .copybox, .note {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      color: var(--ink);
+      resize: vertical;
+    }
+
+    .copybox {
+      min-height: 92px;
+      margin-top: 12px;
+    }
+
+    .note { min-height: 110px; }
+    .status { margin-top: 10px; color: var(--muted); min-height: 24px; }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      aside {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      main { padding: 14px; }
+      section { padding: 20px; }
+      .grid, .two, .calc { grid-template-columns: 1fr; }
+      .match-item { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="mark">DLL</div>
+        <div>
+          <strong>计算机网络</strong>
+          <p class="mini">Chapter 3 复习板</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="章节导航">
+        <a href="#map">考点地图</a>
+        <a href="#reliable">可靠传输</a>
+        <a href="#framing">组帧与检错</a>
+        <a href="#ethernet">以太网与交换机</a>
+        <a href="#quiz">诊断测验</a>
+        <a href="#notes">错题记录</a>
+      </nav>
+      <div class="meter">
+        <strong>本页完成度</strong>
+        <div class="bar" aria-hidden="true"><span id="progressBar"></span></div>
+        <p class="mini" id="progressText">0 / 5 个模块</p>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <h1>第 3 章 数据链路层与局域网</h1>
+        <p class="subtitle">按课件与作业整理：链路层服务、差错检测、可靠传输、MAC 协议、以太网、交换机、VLAN 与 PPP。</p>
+        <div class="tag-row">
+          <span class="tag">Framing / Byte & Bit Stuffing</span>
+          <span class="tag">CRC / Hamming Distance</span>
+          <span class="tag">Stop-and-Wait / GBN / SR</span>
+          <span class="tag">CSMA/CD</span>
+          <span class="tag">Ethernet / Switch / VLAN</span>
+        </div>
+      </section>
+
+      <section id="map">
+        <h2>考点地图</h2>
+        <div class="grid">
+          <article class="card blue">
+            <h3>3.1 链路层服务</h3>
+            <p>负责相邻结点间数据报传输，核心功能包括组帧、物理寻址、流量控制、差错控制和访问控制。</p>
+          </article>
+          <article class="card teal">
+            <h3>3.2 差错检测</h3>
+            <p>奇偶校验、Internet 校验和、CRC 是常见检错码；汉明距离决定检错/纠错能力。</p>
+          </article>
+          <article class="card green">
+            <h3>3.3 可靠传输</h3>
+            <p>停等协议简单但利用率低；流水线和滑动窗口提高利用率；GBN 累积确认，SR 单独确认并缓存乱序帧。</p>
+          </article>
+          <article class="card amber">
+            <h3>3.4 MAC 协议</h3>
+            <p>信道划分、随机访问和轮转访问三类。CSMA/CD 是以太网典型随机访问协议。</p>
+          </article>
+          <article class="card rose">
+            <h3>3.5 局域网</h3>
+            <p>MAC 地址用于局域网接口寻址；以太网帧数据字段 46-1500B；交换机自学习并选择性转发。</p>
+          </article>
+          <article class="card">
+            <h3>作业重点</h3>
+            <p>作业一：滑动窗口吞吐量、GBN 窗口大小与超时重传。作业二/三：以太网帧接收、最小载荷填充。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="reliable">
+        <h2>可靠传输</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>停等/滑动窗口利用率</h3>
+            <div class="formula">U = min(1, Ws * tframe / (tframe + RTT + tack))</div>
+            <div class="calc">
+              <label>发送窗口 Ws<input id="winSize" type="number" value="7"></label>
+              <label>帧发送时延 tframe(ms)<input id="frameTime" type="number" value="64"></label>
+              <label>RTT(ms)<input id="rtt" type="number" value="540"></label>
+              <label>ACK发送时延(ms)<input id="ackTime" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcUtil" title="计算">= 计算</button>
+              <button class="btn good" data-complete="reliable" title="标记完成">✓ 掌握可靠传输</button>
+            </div>
+            <div class="result" id="utilResult"></div>
+          </div>
+          <div class="card">
+            <h3>窗口与序号空间</h3>
+            <div class="formula">Ws + Wr <= 2^k; GBN: Ws <= 2^k - 1; SR: W <= 2^(k-1)</div>
+            <div class="calc">
+              <label>序号位数 k<input id="seqBits" type="number" value="2"></label>
+              <label>协议<input id="protoName" type="text" value="GBN"></label>
+              <label>发送窗口 Ws<input id="seqWs" type="number" value="3"></label>
+              <label>接收窗口 Wr<input id="seqWr" type="number" value="1"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcWindow" title="检查">✓ 检查</button>
+            </div>
+            <div class="result" id="windowResult"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px;">
+          <h3>GBN 累积确认与超时重传</h3>
+          <p class="mini">输入已发送帧范围和收到的 ACK，按 GBN 累积确认规则判断超时后重传哪些帧。</p>
+          <div class="calc">
+            <label>已发送起点<input id="gbnStart" type="number" value="0"></label>
+            <label>已发送终点<input id="gbnEnd" type="number" value="7"></label>
+            <label>收到 ACK 列表<input id="gbnAcks" type="text" value="0,2,3"></label>
+            <label>预留<input id="gbnSpare" type="number" value="0"></label>
+          </div>
+          <div class="toolbar">
+            <button class="btn primary" id="calcGbn" title="判断">= 判断</button>
+          </div>
+          <div class="result" id="gbnResult"></div>
+        </div>
+      </section>
+
+      <section id="framing">
+        <h2>组帧与检错</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>比特填充</h3>
+            <p>定界符 01111110。发送端在有效载荷中每遇到连续 5 个 1，就插入 1 个 0。</p>
+            <div class="calc">
+              <label>比特串<input id="bitStuffInput" type="text" value="01111101111110001110001"></label>
+              <label>连续 1 阈值<input id="stuffRun" type="number" value="5"></label>
+              <label>预留<input id="stuffSpare1" type="number" value="0"></label>
+              <label>预留<input id="stuffSpare2" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcBitStuff" title="填充">= 填充</button>
+              <button class="btn good" data-complete="framing" title="标记完成">✓ 掌握组帧</button>
+            </div>
+            <div class="result" id="bitStuffResult"></div>
+          </div>
+          <div class="card">
+            <h3>CRC 余数</h3>
+            <div class="formula">R = remainder(D * 2^r / G)</div>
+            <div class="calc">
+              <label>数据 D<input id="crcData" type="text" value="101110"></label>
+              <label>生成多项式 G<input id="crcGen" type="text" value="1001"></label>
+              <label>预留<input id="crcSpare1" type="number" value="0"></label>
+              <label>预留<input id="crcSpare2" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcCrc" title="计算 CRC">= 计算</button>
+            </div>
+            <div class="result" id="crcResult"></div>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:14px;">
+          <div class="card">
+            <h3>PPP 字节填充</h3>
+            <p>异步 PPP 中，0x7E 转为 0x7D 0x5E；0x7D 转为 0x7D 0x5D。</p>
+            <div class="calc">
+              <label>十六进制字节<input id="pppBytes" type="text" value="7e 45 7d 03"></label>
+              <label>预留<input id="pppSpare1" type="number" value="0"></label>
+              <label>预留<input id="pppSpare2" type="number" value="0"></label>
+              <label>预留<input id="pppSpare3" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcPpp" title="转义">= 转义</button>
+            </div>
+            <div class="result" id="pppResult"></div>
+          </div>
+          <div class="card">
+            <h3>检错/纠错能力</h3>
+            <div class="formula">检 r 位错: ds >= r+1; 纠 r 位错: ds >= 2r+1</div>
+            <div class="calc">
+              <label>汉明距离 ds<input id="hammingD" type="number" value="3"></label>
+              <label>目标错误位 r<input id="hammingR" type="number" value="1"></label>
+              <label>预留<input id="hamSpare1" type="number" value="0"></label>
+              <label>预留<input id="hamSpare2" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcHamming" title="判断">✓ 判断</button>
+            </div>
+            <div class="result" id="hammingResult"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ethernet">
+        <h2>以太网与交换机</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>以太网填充与帧长</h3>
+            <p class="mini">前导码通常不计入帧长；目的 MAC + 源 MAC + 类型共 14B，FCS 为 4B，数据字段至少 46B。</p>
+            <div class="calc">
+              <label>上层载荷长度(B)<input id="ethPayload" type="number" value="40"></label>
+              <label>最小数据字段(B)<input id="ethMinData" type="number" value="46"></label>
+              <label>最大数据字段(B)<input id="ethMaxData" type="number" value="1500"></label>
+              <label>首尾开销(B)<input id="ethOverhead" type="number" value="18"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcEthernet" title="计算">= 计算</button>
+              <button class="btn good" data-complete="ethernet" title="标记完成">✓ 掌握以太网</button>
+            </div>
+            <div class="result" id="ethernetResult"></div>
+          </div>
+          <div class="card">
+            <h3>CSMA/CD 最小帧长</h3>
+            <div class="formula">Lmin / R = 2dmax / V</div>
+            <div class="calc">
+              <label>速率 R (bps)<input id="csmaR" type="number" value="1000000000"></label>
+              <label>最大距离 dmax(m)<input id="csmaD" type="number" value="80"></label>
+              <label>传播速度 V(m/s)<input id="csmaV" type="number" value="200000000"></label>
+              <label>预留<input id="csmaSpare" type="number" value="0"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcCsma" title="计算">= 计算</button>
+            </div>
+            <div class="result" id="csmaResult"></div>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:14px;">
+          <div class="card">
+            <h3>交换机转发判断</h3>
+            <p class="mini">交换机先学习源 MAC 与输入端口，再查目的 MAC；未知则泛洪，目的在同端口则丢弃。</p>
+            <div class="calc">
+              <label>交换表 A:1,B:2<input id="switchTable" type="text" value="A:1,B:2"></label>
+              <label>输入端口<input id="switchIn" type="number" value="3"></label>
+              <label>源 MAC<input id="switchSrc" type="text" value="C"></label>
+              <label>目的 MAC<input id="switchDst" type="text" value="A"></label>
+            </div>
+            <div class="toolbar">
+              <button class="btn primary" id="calcSwitch" title="转发">= 转发</button>
+            </div>
+            <div class="result" id="switchResult"></div>
+          </div>
+          <div class="card">
+            <h3>概念配对</h3>
+            <div class="pill-bank" id="conceptBank"></div>
+            <div class="pill-bank" id="answerBank"></div>
+            <div class="match-list" id="conceptMatchList"></div>
+            <div class="toolbar">
+              <button class="btn primary" id="checkConcept" title="检查">✓ 检查</button>
+              <button class="btn" id="resetConcept" title="重置">↺ 重置</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="quiz">
+        <h2>诊断测验</h2>
+        <div id="quizBox"></div>
+        <div class="toolbar">
+          <button class="btn primary" id="scoreQuiz" title="评分">✓ 评分</button>
+          <button class="btn" id="resetQuiz" title="重做">↺ 重做</button>
+          <button class="btn" id="appendQuizNotes" title="加入错题记录">＋ 加入错题记录</button>
+          <button class="btn" id="copyQuizSummary" title="复制摘要">⧉ 复制摘要</button>
+          <button class="btn good" data-complete="quiz" title="标记完成">✓ 完成测验</button>
+        </div>
+        <div class="result" id="quizResult"></div>
+        <textarea class="copybox" id="quizSummary" readonly placeholder="评分后这里会生成反馈摘要。"></textarea>
+      </section>
+
+      <section id="notes">
+        <h2>错题记录</h2>
+        <textarea class="note" id="notesBox" placeholder="把不稳的题号、公式、概念写在这里。"></textarea>
+        <div class="toolbar">
+          <button class="btn primary" id="saveNotes" title="保存到浏览器">↓ 保存</button>
+          <button class="btn" id="clearNotes" title="清空记录">× 清空</button>
+        </div>
+        <p class="status" id="noteStatus"></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const conceptPairs = [
+      ["CRC", "模2除法余数"],
+      ["GBN", "累积确认"],
+      ["SR", "缓存乱序帧"],
+      ["VLAN trunk", "携带 VLAN ID"],
+      ["Switch", "自学习转发表"]
+    ];
+
+    const quiz = [
+      {
+        q: "数据链路层负责哪两个结点之间的数据传输？",
+        options: ["任意两个进程", "相邻物理链路直接相连的结点", "任意两个自治系统", "根 DNS 到权威 DNS"],
+        answer: 1,
+        topic: "链路层服务",
+        why: "链路层负责通过一条链路把数据报从一个结点交给相邻结点。"
+      },
+      {
+        q: "比特填充中，遇到有效载荷里连续几个 1 后插入 0？",
+        options: ["3 个", "4 个", "5 个", "6 个"],
+        answer: 2,
+        topic: "组帧透明传输",
+        why: "为了避免出现 01111110 定界符模式，连续 5 个 1 后插入 0。"
+      },
+      {
+        q: "CRC 接收端如何判断无差错？",
+        options: ["校验和字段为 1", "用生成多项式除收到比特串余数为 0", "收到 ACK 即无错", "帧长度大于 64B"],
+        answer: 1,
+        topic: "差错检测",
+        why: "CRC 让 <D,R> 可被 G 模2整除，接收端余数全 0 视为无错。"
+      },
+      {
+        q: "GBN 接收方对乱序到达的帧通常如何处理？",
+        options: ["缓存并等待缺失帧", "直接交付网络层", "丢弃并重发最近按序 ACK", "扩大接收窗口"],
+        answer: 2,
+        topic: "可靠传输",
+        why: "GBN 接收窗口 Wr=1，不缓存乱序帧，会重复确认最高按序收到的帧。"
+      },
+      {
+        q: "k 位序号下，GBN 最大发送窗口是多少？",
+        options: ["2^k", "2^k - 1", "2^(k-1)", "k - 1"],
+        answer: 1,
+        topic: "窗口约束",
+        why: "一般约束 Ws+Wr <= 2^k，GBN 的 Wr=1，所以 Ws <= 2^k-1。"
+      },
+      {
+        q: "CSMA/CD 中 CD 指什么？",
+        options: ["Collision Detection", "Code Division", "Connection Delay", "Carrier Distribution"],
+        answer: 0,
+        topic: "MAC协议",
+        why: "CSMA/CD 是载波监听多路访问加冲突检测。"
+      },
+      {
+        q: "以太网帧数据字段最小长度是多少？",
+        options: ["20B", "40B", "46B", "64B"],
+        answer: 2,
+        topic: "以太网帧",
+        why: "以太网最小帧长 64B，除去目的/源/类型和 FCS 共 18B，数据字段最小 46B。"
+      },
+      {
+        q: "如果 IP 分组总长度为 40B，被封装进以太网数据字段，需要填充多少字节？",
+        options: ["0B", "4B", "6B", "24B"],
+        answer: 2,
+        topic: "以太网填充",
+        why: "40B 小于以太网数据字段最小 46B，所以填充 6B。"
+      },
+      {
+        q: "交换机收到帧时首先学习什么？",
+        options: ["目的 IP 和输出端口", "源 MAC 和输入端口", "TCP 端口和 VLAN", "DNS 名称和 MAC"],
+        answer: 1,
+        topic: "交换机自学习",
+        why: "交换机根据收到帧的源 MAC 与输入接口更新交换表。"
+      },
+      {
+        q: "802.1Q 在以太网帧中插入多长的 VLAN 标记？",
+        options: ["2B", "4B", "6B", "8B"],
+        answer: 1,
+        topic: "VLAN与PPP",
+        why: "802.1Q 在源地址与类型字段之间插入 4 字节 VLAN 标记。"
+      }
+    ];
+
+    const reviewAdvice = {
+      "链路层服务": "先默写链路层六项功能：组帧、寻址、流量控制、差错控制、访问控制、相邻结点传输。",
+      "组帧透明传输": "练字节填充和比特填充：FLAG/ESC 走字节填充，连续 5 个 1 走比特填充。",
+      "差错检测": "把奇偶校验、Checksum、CRC 放进同一张表，重点会算 CRC 余数和理解余数为 0 的判断。",
+      "可靠传输": "对比停等、GBN、SR：GBN 不缓存乱序且累积 ACK，SR 缓存乱序且单独 ACK。",
+      "窗口约束": "记通用式 Ws+Wr<=2^k，并马上推出 GBN 与 SR 的特例；回刷作业一第 6 题。",
+      "MAC协议": "三类 MAC 协议按轻载/重载表现比较：信道划分、随机访问、轮转访问。",
+      "以太网帧": "记帧字段 8/6/6/2/46-1500/4，前导码通常不计入帧长，最小帧长 64B。",
+      "以太网填充": "凡上层载荷小于 46B 就补到 46B；作业三的 40B 载荷需填充 6B。",
+      "交换机自学习": "按三步想：学源 MAC、查目的 MAC、转发/丢弃/泛洪。",
+      "VLAN与PPP": "VLAN 重点是广播域隔离和 trunk 携带 VLAN ID；PPP 重点是组帧、透明传输和只检错不纠错。"
+    };
+
+    let selectedConcept = null;
+    let lastQuizReport = "";
+    const conceptMatches = {};
+    const completed = new Set(JSON.parse(localStorage.getItem("cn-ch3-complete") || "[]"));
+
+    function markProgress() {
+      const total = 5;
+      const done = completed.size;
+      document.getElementById("progressBar").style.width = `${Math.min(100, done / total * 100)}%`;
+      document.getElementById("progressText").textContent = `${done} / ${total} 个模块`;
+      localStorage.setItem("cn-ch3-complete", JSON.stringify([...completed]));
+    }
+
+    function bitsOnly(text) {
+      return text.replace(/[^01]/g, "");
+    }
+
+    function listNumbers(text) {
+      return text.split(",").map(item => Number(item.trim())).filter(Number.isFinite);
+    }
+
+    function renderConcepts() {
+      document.getElementById("conceptBank").innerHTML = conceptPairs.map(([concept]) => `<button class="pill" data-concept="${concept}">${concept}</button>`).join("");
+      document.getElementById("answerBank").innerHTML = conceptPairs.map(([, answer]) => `<button class="pill" data-concept-answer="${answer}">${answer}</button>`).join("");
+      document.getElementById("conceptMatchList").innerHTML = conceptPairs.map(([concept]) => {
+        const answer = conceptMatches[concept] || "未配对";
+        return `<div class="match-item"><strong>${concept}</strong><div class="answer" data-answer-for="${concept}">${answer}</div></div>`;
+      }).join("");
+    }
+
+    function renderQuiz() {
+      document.getElementById("quizBox").innerHTML = quiz.map((item, idx) => `
+        <div class="quiz-item" data-idx="${idx}">
+          <strong>${idx + 1}. ${item.q}</strong>
+          <div class="options">
+            ${item.options.map((option, optIdx) => `<button class="option" data-option="${optIdx}">${option}</button>`).join("")}
+          </div>
+          <p class="feedback"></p>
+        </div>
+      `).join("");
+    }
+
+    function crcRemainder(data, generator) {
+      const cleanData = bitsOnly(data);
+      const cleanGen = bitsOnly(generator);
+      if (cleanGen.length < 2 || cleanGen[0] !== "1") return "";
+      const r = cleanGen.length - 1;
+      const work = (cleanData + "0".repeat(r)).split("").map(Number);
+      const gen = cleanGen.split("").map(Number);
+      for (let i = 0; i <= work.length - cleanGen.length; i += 1) {
+        if (work[i] === 1) {
+          for (let j = 0; j < gen.length; j += 1) {
+            work[i + j] = work[i + j] ^ gen[j];
+          }
+        }
+      }
+      return work.slice(-r).join("");
+    }
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target.matches("[data-complete]")) {
+        completed.add(target.dataset.complete);
+        markProgress();
+      }
+      if (target.matches("[data-concept]")) {
+        selectedConcept = target.dataset.concept;
+        document.querySelectorAll("[data-concept]").forEach(btn => btn.classList.toggle("selected", btn === target));
+      }
+      if (target.matches("[data-concept-answer]") && selectedConcept) {
+        conceptMatches[selectedConcept] = target.dataset.conceptAnswer;
+        selectedConcept = null;
+        renderConcepts();
+      }
+      if (target.matches(".option")) {
+        const item = target.closest(".quiz-item");
+        item.dataset.chosen = target.dataset.option;
+        item.querySelectorAll(".option").forEach(btn => btn.classList.remove("selected"));
+        target.classList.add("selected");
+      }
+    });
+
+    document.getElementById("calcUtil").addEventListener("click", () => {
+      const ws = Number(document.getElementById("winSize").value);
+      const tframe = Number(document.getElementById("frameTime").value);
+      const rtt = Number(document.getElementById("rtt").value);
+      const tack = Number(document.getElementById("ackTime").value);
+      const raw = ws * tframe / (tframe + rtt + tack);
+      const util = Math.min(1, raw);
+      document.getElementById("utilResult").textContent =
+        `利用率约 ${(util * 100).toFixed(2)}%。未截断值为 ${(raw * 100).toFixed(2)}%，超过 100% 时按满载处理。`;
+    });
+
+    document.getElementById("calcWindow").addEventListener("click", () => {
+      const k = Number(document.getElementById("seqBits").value);
+      const proto = document.getElementById("protoName").value.trim().toUpperCase();
+      const ws = Number(document.getElementById("seqWs").value);
+      const wr = Number(document.getElementById("seqWr").value);
+      const space = Math.pow(2, k);
+      const gbnMax = space - 1;
+      const srMax = Math.pow(2, k - 1);
+      const ok = ws + wr <= space;
+      const special = proto.includes("GBN")
+        ? `GBN 特例最大 Ws=${gbnMax}。`
+        : proto.includes("SR")
+          ? `典型 SR 最大 W=${srMax}。`
+          : "通用约束看 Ws+Wr。";
+      document.getElementById("windowResult").textContent =
+        `序号空间 2^${k}=${space}，当前 Ws+Wr=${ws + wr}，${ok ? "满足" : "不满足"}通用约束。${special}`;
+    });
+
+    document.getElementById("calcGbn").addEventListener("click", () => {
+      const start = Number(document.getElementById("gbnStart").value);
+      const end = Number(document.getElementById("gbnEnd").value);
+      const acks = listNumbers(document.getElementById("gbnAcks").value);
+      const highest = acks.length ? Math.max(...acks) : start - 1;
+      const resend = [];
+      for (let i = Math.max(start, highest + 1); i <= end; i += 1) resend.push(i);
+      document.getElementById("gbnResult").textContent =
+        `GBN 累积确认到 ${highest}。超时后重传 ${resend.length} 个帧：${resend.join(", ") || "无"}。`;
+    });
+
+    document.getElementById("calcBitStuff").addEventListener("click", () => {
+      const input = bitsOnly(document.getElementById("bitStuffInput").value);
+      const threshold = Number(document.getElementById("stuffRun").value);
+      let run = 0;
+      let output = "";
+      for (const bit of input) {
+        output += bit;
+        if (bit === "1") {
+          run += 1;
+          if (run === threshold) {
+            output += "0";
+            run = 0;
+          }
+        } else {
+          run = 0;
+        }
+      }
+      document.getElementById("bitStuffResult").textContent = `填充后：${output}`;
+    });
+
+    document.getElementById("calcCrc").addEventListener("click", () => {
+      const data = document.getElementById("crcData").value;
+      const gen = document.getElementById("crcGen").value;
+      const r = crcRemainder(data, gen);
+      const cleanData = bitsOnly(data);
+      document.getElementById("crcResult").textContent =
+        r ? `CRC 余数 R=${r}，发送比特串为 ${cleanData}${r}。` : "请输入有效的二进制数据和以 1 开头的生成多项式。";
+    });
+
+    document.getElementById("calcPpp").addEventListener("click", () => {
+      const bytes = document.getElementById("pppBytes").value.trim().split(/\s+/).map(item => item.toLowerCase());
+      const escaped = [];
+      for (const byte of bytes) {
+        if (byte === "7e") escaped.push("7d", "5e");
+        else if (byte === "7d") escaped.push("7d", "5d");
+        else if (byte === "03") escaped.push("7d", "23");
+        else if (byte === "11") escaped.push("7d", "31");
+        else if (byte === "13") escaped.push("7d", "33");
+        else escaped.push(byte);
+      }
+      document.getElementById("pppResult").textContent = `转义后：${escaped.join(" ")}`;
+    });
+
+    document.getElementById("calcHamming").addEventListener("click", () => {
+      const ds = Number(document.getElementById("hammingD").value);
+      const r = Number(document.getElementById("hammingR").value);
+      const detect = ds >= r + 1;
+      const correct = ds >= 2 * r + 1;
+      document.getElementById("hammingResult").textContent =
+        `检测 ${r} 位错：${detect ? "可以" : "不保证"}；纠正 ${r} 位错：${correct ? "可以" : "不保证"}。`;
+    });
+
+    document.getElementById("calcEthernet").addEventListener("click", () => {
+      const payload = Number(document.getElementById("ethPayload").value);
+      const minData = Number(document.getElementById("ethMinData").value);
+      const maxData = Number(document.getElementById("ethMaxData").value);
+      const overhead = Number(document.getElementById("ethOverhead").value);
+      const pad = Math.max(0, minData - payload);
+      const dataField = Math.max(minData, payload);
+      const frameLen = dataField + overhead;
+      const tooLarge = payload > maxData;
+      document.getElementById("ethernetResult").textContent =
+        `需要填充 ${pad}B，数据字段 ${dataField}B，帧长 ${frameLen}B（不含前导码）。${tooLarge ? "载荷超过最大数据字段，需要分片或由上层处理。" : ""}`;
+    });
+
+    document.getElementById("calcCsma").addEventListener("click", () => {
+      const r = Number(document.getElementById("csmaR").value);
+      const d = Number(document.getElementById("csmaD").value);
+      const v = Number(document.getElementById("csmaV").value);
+      const lmin = r * 2 * d / v;
+      document.getElementById("csmaResult").textContent =
+        `最小帧长 Lmin = ${lmin.toFixed(0)} bit = ${(lmin / 8).toFixed(2)} B。`;
+    });
+
+    document.getElementById("calcSwitch").addEventListener("click", () => {
+      const entries = document.getElementById("switchTable").value.split(",").map(item => item.trim()).filter(Boolean);
+      const table = new Map();
+      for (const entry of entries) {
+        const [mac, port] = entry.split(":").map(item => item.trim());
+        if (mac && port) table.set(mac, port);
+      }
+      const inPort = String(Number(document.getElementById("switchIn").value));
+      const src = document.getElementById("switchSrc").value.trim();
+      const dst = document.getElementById("switchDst").value.trim();
+      if (src) table.set(src, inPort);
+      let action = "";
+      if (!table.has(dst)) action = `目的 ${dst} 未知：向除端口 ${inPort} 外的所有端口泛洪。`;
+      else if (table.get(dst) === inPort) action = `目的 ${dst} 已知且在输入端口 ${inPort}：丢弃该帧。`;
+      else action = `目的 ${dst} 已知：转发到端口 ${table.get(dst)}。`;
+      const learned = [...table.entries()].map(([mac, port]) => `${mac}:${port}`).join(", ");
+      document.getElementById("switchResult").textContent = `${action} 更新后的交换表：${learned}`;
+    });
+
+    document.getElementById("checkConcept").addEventListener("click", () => {
+      document.querySelectorAll("[data-answer-for]").forEach(el => {
+        const concept = el.dataset.answerFor;
+        const expected = conceptPairs.find(pair => pair[0] === concept)[1];
+        el.classList.remove("correct", "wrong");
+        el.classList.add(conceptMatches[concept] === expected ? "correct" : "wrong");
+      });
+    });
+
+    document.getElementById("resetConcept").addEventListener("click", () => {
+      Object.keys(conceptMatches).forEach(key => delete conceptMatches[key]);
+      selectedConcept = null;
+      renderConcepts();
+    });
+
+    document.getElementById("scoreQuiz").addEventListener("click", () => {
+      let score = 0;
+      const missed = [];
+      const weakTopics = {};
+      document.querySelectorAll(".quiz-item").forEach((item, idx) => {
+        const chosen = Number(item.dataset.chosen);
+        const correct = quiz[idx].answer;
+        item.querySelectorAll(".option").forEach(btn => {
+          const opt = Number(btn.dataset.option);
+          btn.classList.remove("correct", "wrong");
+          if (opt === correct) btn.classList.add("correct");
+          if (opt === chosen && opt !== correct) btn.classList.add("wrong");
+        });
+        if (chosen === correct) score += 1;
+        if (chosen !== correct) {
+          missed.push(idx + 1);
+          weakTopics[quiz[idx].topic] = (weakTopics[quiz[idx].topic] || 0) + 1;
+        }
+        item.querySelector(".feedback").textContent = quiz[idx].why;
+      });
+      const topicOrder = Object.entries(weakTopics).sort((a, b) => b[1] - a[1]).map(([topic]) => topic);
+      const weak = score >= 8 ? "第三章基础比较稳，后续重点做综合题提速。" : score >= 6 ? "主干概念可用，窗口/以太网细节需要回刷。" : "先把可靠传输、以太网帧、交换机三块重新过一遍。";
+      const plan = topicOrder.length
+        ? topicOrder.map((topic, idx) => `<div class="review-plan-item"><strong>${idx + 1}. ${topic}</strong><p>${reviewAdvice[topic]}</p></div>`).join("")
+        : `<div class="review-plan-item"><strong>进入 Chapter 4 前的保持练习</strong><p>重做 GBN 窗口、以太网填充和交换机转发三个小工具各一次。</p></div>`;
+      lastQuizReport = [
+        `Chapter 3 自测：${score}/${quiz.length}`,
+        `错题：${missed.length ? missed.join(", ") : "无"}`,
+        `薄弱主题：${topicOrder.length ? topicOrder.join("、") : "无明显薄弱主题"}`,
+        `建议：${topicOrder.length ? topicOrder.map(topic => `${topic}: ${reviewAdvice[topic]}`).join(" | ") : "保持可靠传输、以太网帧和交换机转发的快速回忆。"}`
+      ].join("\n");
+      document.getElementById("quizResult").innerHTML = `得分 ${score} / ${quiz.length}。${weak}<div class="review-plan">${plan}</div>`;
+      document.getElementById("quizSummary").value = lastQuizReport;
+    });
+
+    document.getElementById("resetQuiz").addEventListener("click", () => {
+      renderQuiz();
+      document.getElementById("quizResult").textContent = "";
+      document.getElementById("quizSummary").value = "";
+      lastQuizReport = "";
+    });
+
+    const notesBox = document.getElementById("notesBox");
+    notesBox.value = localStorage.getItem("cn-ch3-notes") || "";
+
+    document.getElementById("saveNotes").addEventListener("click", () => {
+      localStorage.setItem("cn-ch3-notes", notesBox.value);
+      document.getElementById("noteStatus").textContent = "已保存。";
+    });
+
+    document.getElementById("clearNotes").addEventListener("click", () => {
+      notesBox.value = "";
+      localStorage.removeItem("cn-ch3-notes");
+      document.getElementById("noteStatus").textContent = "已清空。";
+    });
+
+    document.getElementById("appendQuizNotes").addEventListener("click", () => {
+      if (!lastQuizReport) {
+        document.getElementById("quizSummary").value = "请先评分，再加入错题记录。";
+        return;
+      }
+      const prefix = notesBox.value.trim() ? "\n\n" : "";
+      notesBox.value += `${prefix}${lastQuizReport}`;
+      localStorage.setItem("cn-ch3-notes", notesBox.value);
+      document.getElementById("noteStatus").textContent = "已加入错题记录。";
+    });
+
+    document.getElementById("copyQuizSummary").addEventListener("click", async () => {
+      if (!lastQuizReport) {
+        document.getElementById("quizSummary").value = "请先评分，再复制摘要。";
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(lastQuizReport);
+        document.getElementById("quizSummary").value = `${lastQuizReport}\n\n已复制。`;
+      } catch (error) {
+        document.getElementById("quizSummary").value = `${lastQuizReport}\n\n复制受限时，可手动选中这段摘要。`;
+        document.getElementById("quizSummary").select();
+      }
+    });
+
+    renderConcepts();
+    renderQuiz();
+    markProgress();
+    document.getElementById("calcUtil").click();
+    document.getElementById("calcWindow").click();
+    document.getElementById("calcGbn").click();
+    document.getElementById("calcBitStuff").click();
+    document.getElementById("calcCrc").click();
+    document.getElementById("calcPpp").click();
+    document.getElementById("calcHamming").click();
+    document.getElementById("calcEthernet").click();
+    document.getElementById("calcCsma").click();
+    document.getElementById("calcSwitch").click();
+  </script>
+</body>
+</html>

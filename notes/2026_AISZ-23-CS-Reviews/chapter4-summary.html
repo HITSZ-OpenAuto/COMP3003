@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第4章 网络层 - 计算机网络复习</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body data-storage="network-review-ch4">
+  <header class="topbar">
+    <a class="back-link" href="index.html">返回总览</a>
+    <div class="title-block">
+      <p class="eyebrow">Chapter 4</p>
+      <h1>第4章 网络层</h1>
+      <p>这是作业与期末核心章: IPv4 首部、分片、子网/CIDR、最长前缀、ARP/DHCP/NAT、RIP/OSPF/BGP。</p>
+    </div>
+    <div class="progress-panel">
+      <strong id="progressText">0%</strong>
+      <span>掌握度</span>
+      <div class="progress-track"><div id="progressBar"></div></div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="" href="chapter1-summary.html">第1章</a><a class="" href="chapter2-summary.html">第2章</a><a class="" href="chapter3-summary.html">第3章</a><a class="active" href="chapter4-summary.html">第4章</a><a class="" href="chapter5-summary.html">第5章</a><a class="" href="chapter6-summary.html">第6章</a><a class="" href="chapter7-summary.html">第7章</a>
+    </nav>
+
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索本章</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 NAT、Reno、CRC">
+      </label>
+      <button id="toggleUnmastered" type="button">只看未掌握</button>
+      <button id="expandAll" type="button">展开全部</button>
+      <button id="collapseAll" type="button">收起全部</button>
+    </section>
+
+    <section class="meta-grid">
+      <article>
+        <h2>来源</h2>
+        <p>Chapter4-Network Layer-学生.pdf</p>
+      </article>
+      <article>
+        <h2>作业关联</h2>
+        <ul><li>作业二: IPv4 首部字段解析</li><li>作业二: 最长前缀匹配与路由表新增项</li><li>作业二: 子网划分</li><li>作业二: NAT 地址转换</li><li>作业二: RIP 路由表</li><li>作业二: IPv6 表示、隧道与分片</li></ul>
+      </article>
+      <article>
+        <h2>期末线索</h2>
+        <ul><li>填空: DHCP 基于 UDP</li><li>填空: IPv4 地址长度 32 bit</li><li>选择: 最长前缀匹配</li><li>选择: NAT 转换变化</li><li>选择: IPv4 分片与重组</li><li>分析: 子网、OSPF、ARP、NAT</li></ul>
+      </article>
+    </section>
+
+    <section class="layout">
+      <div class="main-column">
+        
+    <section class="detail-entry">
+      <div>
+        <p class="eyebrow">Deep Dive</p>
+        <h2>详细介绍页</h2>
+        <p>本章的考试细节、逐 bit 字段图、协议状态转移和作业例题已拆到单独页面，便于总结页保持清爽。</p>
+      </div>
+      <a href="chapter4-detail.html">打开第4章详细介绍</a>
+    </section>
+  
+
+        <h2>知识点总结</h2>
+        
+    <section class="topic-card" data-search="网络层服务 网络层提供主机到主机的逻辑通信，将传输层 segment 封装进 IP datagram。 核心功能是转发和路由: 转发是本路由器输入端口到输出端口的局部动作，路由是端到端路径选择。 虚电路网络先建立逻辑连接，分组携带 VC ID；数据报网络每个分组独立携带目的地址。">
+      <button class="topic-head" type="button" aria-expanded="true">
+        <span>网络层服务</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body open">
+        <ul><li>网络层提供主机到主机的逻辑通信，将传输层 segment 封装进 IP datagram。</li><li>核心功能是转发和路由: 转发是本路由器输入端口到输出端口的局部动作，路由是端到端路径选择。</li><li>虚电路网络先建立逻辑连接，分组携带 VC ID；数据报网络每个分组独立携带目的地址。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="路由器与转发表 路由器输入端口执行物理/链路/网络层处理与查表，交换结构把分组送到输出端口。 输出端口可能出现排队、调度和丢包，缓冲区并不能无限消除拥塞。 转发表由路由算法/协议生成，实际转发按最长前缀匹配选择最具体表项。">
+      <button class="topic-head" type="button" aria-expanded="true">
+        <span>路由器与转发表</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body open">
+        <ul><li>路由器输入端口执行物理/链路/网络层处理与查表，交换结构把分组送到输出端口。</li><li>输出端口可能出现排队、调度和丢包，缓冲区并不能无限消除拥塞。</li><li>转发表由路由算法/协议生成，实际转发按最长前缀匹配选择最具体表项。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="IPv4 数据报 IPv4 首部最小 20B，字段包括版本、首部长度、TOS、总长度、标识、标志、片偏移、TTL、协议、首部校验和、源/目的 IP。 总长度字段 16 bit，表示 IP 首部加数据的总字节数。 TTL 每经过一个路由器减 1，可用于根据初始 TTL 和到达 TTL 推断经过路由器数。 协议字段指示上层协议，例如 TCP=6、UDP=17、ICMP=1。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>IPv4 数据报</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>IPv4 首部最小 20B，字段包括版本、首部长度、TOS、总长度、标识、标志、片偏移、TTL、协议、首部校验和、源/目的 IP。</li><li>总长度字段 16 bit，表示 IP 首部加数据的总字节数。</li><li>TTL 每经过一个路由器减 1，可用于根据初始 TTL 和到达 TTL 推断经过路由器数。</li><li>协议字段指示上层协议，例如 TCP=6、UDP=17、ICMP=1。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="分片与重组 链路 MTU 小于 IP 数据报长度且 DF=0 时，路由器可以分片；重组只在目的主机完成。 同一原始数据报的所有分片复制相同标识字段。 片偏移以 8B 为单位，除最后一片外，每片数据长度通常取不超过 MTU-20 的最大 8B 倍数。 DF=1 且长度超过 MTU 时路由器丢弃分组，并通常向源主机发送 ICMP 差错报文。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>分片与重组</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>链路 MTU 小于 IP 数据报长度且 DF=0 时，路由器可以分片；重组只在目的主机完成。</li><li>同一原始数据报的所有分片复制相同标识字段。</li><li>片偏移以 8B 为单位，除最后一片外，每片数据长度通常取不超过 MTU-20 的最大 8B 倍数。</li><li>DF=1 且长度超过 MTU 时路由器丢弃分组，并通常向源主机发送 ICMP 差错报文。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="IP 地址、子网与 CIDR IP 地址与接口关联，不是与整台路由器关联。 子网是不跨越路由器即可互相物理连通、拥有相同网络前缀的一组接口。 子网掩码网络位为 1、主机位为 0；CIDR 写作 a.b.c.d/x。 路由聚合要求共同前缀、相同下一跳/接口，并避免产生路由黑洞；转发时仍遵循最长前缀匹配。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>IP 地址、子网与 CIDR</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>IP 地址与接口关联，不是与整台路由器关联。</li><li>子网是不跨越路由器即可互相物理连通、拥有相同网络前缀的一组接口。</li><li>子网掩码网络位为 1、主机位为 0；CIDR 写作 a.b.c.d/x。</li><li>路由聚合要求共同前缀、相同下一跳/接口，并避免产生路由黑洞；转发时仍遵循最长前缀匹配。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="ARP、DHCP、ICMP、NAT ARP 在同一 LAN 内由 IP 地址解析 MAC 地址，请求广播、应答单播，节点维护带 TTL 的 ARP 表。 跨 LAN 通信时 IP 源/目的地址端到端不变，每一跳链路层源/目的 MAC 会变化。 DHCP 采用 Discover/Offer/Request/ACK 四步，基于 UDP，常用广播，返回 IP、掩码、默认网关、DNS。 ICMP 支持差错报告和网络探询，traceroute 利用 TTL 超期与目的端口不可达报文。 NAT 将内网源 IP/端口映射为公网 IP/端口，维护 NAT 表；返回报文按表项改写目的 IP/端口。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>ARP、DHCP、ICMP、NAT</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>ARP 在同一 LAN 内由 IP 地址解析 MAC 地址，请求广播、应答单播，节点维护带 TTL 的 ARP 表。</li><li>跨 LAN 通信时 IP 源/目的地址端到端不变，每一跳链路层源/目的 MAC 会变化。</li><li>DHCP 采用 Discover/Offer/Request/ACK 四步，基于 UDP，常用广播，返回 IP、掩码、默认网关、DNS。</li><li>ICMP 支持差错报告和网络探询，traceroute 利用 TTL 超期与目的端口不可达报文。</li><li>NAT 将内网源 IP/端口映射为公网 IP/端口，维护 NAT 表；返回报文按表项改写目的 IP/端口。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="路由算法与协议 链路状态算法掌握全局拓扑和费用，典型为 Dijkstra；OSPF 属于链路状态协议。 距离向量算法基于 Bellman-Ford，与邻居交换距离向量；RIP 属于距离向量协议。 RIP 度量是跳数，最大 15，16 表示不可达，通常每 30 秒向邻居通告。 OSPF 在 AS 内泛洪链路状态通告，可分层为区域和主干区。 BGP 是 AS 间路由协议，基于 TCP 会话交换路径向量，关注可达性和策略。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>路由算法与协议</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>链路状态算法掌握全局拓扑和费用，典型为 Dijkstra；OSPF 属于链路状态协议。</li><li>距离向量算法基于 Bellman-Ford，与邻居交换距离向量；RIP 属于距离向量协议。</li><li>RIP 度量是跳数，最大 15，16 表示不可达，通常每 30 秒向邻居通告。</li><li>OSPF 在 AS 内泛洪链路状态通告，可分层为区域和主干区。</li><li>BGP 是 AS 间路由协议，基于 TCP 会话交换路径向量，关注可达性和策略。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="IPv6 与过渡 IPv6 地址 128 bit，基本首部固定 40B，移除首部校验和，选项移到扩展首部。 IPv6 基本首部不允许路由器分片，路径 MTU 问题通过 ICMPv6 Packet Too Big 等处理。 IPv6 压缩可用 :: 表示连续 0，但一个地址中只能使用一次。 隧道技术把 IPv6 数据报作为 IPv4 数据报载荷穿越 IPv4 网络。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>IPv6 与过渡</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>IPv6 地址 128 bit，基本首部固定 40B，移除首部校验和，选项移到扩展首部。</li><li>IPv6 基本首部不允许路由器分片，路径 MTU 问题通过 ICMPv6 Packet Too Big 等处理。</li><li>IPv6 压缩可用 :: 表示连续 0，但一个地址中只能使用一次。</li><li>隧道技术把 IPv6 数据报作为 IPv4 数据报载荷穿越 IPv4 网络。</li></ul>
+      </div>
+    </section>
+  
+
+        <h2>公式与判定</h2>
+        <div class="formula-grid">
+    <article class="formula-card" data-search="IPv4 首部长度 IHL * 4 bytes IHL=5 时首部为 20B。">
+      <div class="formula-name">IPv4 首部长度</div>
+      <code>IHL * 4 bytes</code>
+      <p>IHL=5 时首部为 20B。</p>
+    </article>
+  
+    <article class="formula-card" data-search="IP 数据长度 data = total length - header length 作业二第 1 题核心。">
+      <div class="formula-name">IP 数据长度</div>
+      <code>data = total length - header length</code>
+      <p>作业二第 1 题核心。</p>
+    </article>
+  
+    <article class="formula-card" data-search="最大分片数据 d = floor((MTU - 20) / 8) * 8 默认无 IP 选项时。">
+      <div class="formula-name">最大分片数据</div>
+      <code>d = floor((MTU - 20) / 8) * 8</code>
+      <p>默认无 IP 选项时。</p>
+    </article>
+  
+    <article class="formula-card" data-search="分片数 n = ceil((L - 20) / d) L 是原 IP 数据报总长度。">
+      <div class="formula-name">分片数</div>
+      <code>n = ceil((L - 20) / d)</code>
+      <p>L 是原 IP 数据报总长度。</p>
+    </article>
+  
+    <article class="formula-card" data-search="片偏移 offset_i = (i-1) * d / 8 偏移字段以 8B 为单位。">
+      <div class="formula-name">片偏移</div>
+      <code>offset_i = (i-1) * d / 8</code>
+      <p>偏移字段以 8B 为单位。</p>
+    </article>
+  
+    <article class="formula-card" data-search="可用主机数 2^(32-prefix) - 2 普通单播子网，排除网络地址和广播地址。">
+      <div class="formula-name">可用主机数</div>
+      <code>2^(32-prefix) - 2</code>
+      <p>普通单播子网，排除网络地址和广播地址。</p>
+    </article>
+  </div>
+
+        <h2>易错点</h2>
+        <div class="warning-box"><ul><li>最长前缀匹配不是找第一个匹配，而是找前缀最长的匹配。</li><li>分片后的标识字段相同，不是各不相同。</li><li>片偏移单位是 8B，不是 1B。</li><li>重组在目的主机完成，不在中间路由器完成。</li><li>NAT 出站通常改变源 IP/端口，目的 IP 不变；入站返回报文通常改变目的 IP/端口。</li><li>默认路由应写作 0.0.0.0/0，不是 0.0.0.0/32。</li></ul></div>
+
+        <h2>快速自查</h2>
+        <div class="qa-grid">
+    <article class="qa-card" data-search="IPv4 总长度 0x0054、IHL=5 时数据长度? 0x54=84B，首部 20B，数据 64B。">
+      <button type="button" class="qa-question">IPv4 总长度 0x0054、IHL=5 时数据长度?</button>
+      <p class="qa-answer">0x54=84B，首部 20B，数据 64B。</p>
+    </article>
+  
+    <article class="qa-card" data-search="4000B 数据报经 MTU=1500 链路如何分片? 数据 3980B；每片数据 d=1480B；长度 1500、1500、1040；偏移 0、185、370；MF 1、1、0。">
+      <button type="button" class="qa-question">4000B 数据报经 MTU=1500 链路如何分片?</button>
+      <p class="qa-answer">数据 3980B；每片数据 d=1480B；长度 1500、1500、1040；偏移 0、185、370；MF 1、1、0。</p>
+    </article>
+  
+    <article class="qa-card" data-search="RIP 中距离 16 表示什么? 不可达。RIP 最大有效跳数为 15。">
+      <button type="button" class="qa-question">RIP 中距离 16 表示什么?</button>
+      <p class="qa-answer">不可达。RIP 最大有效跳数为 15。</p>
+    </article>
+  </div>
+      </div>
+
+      <aside class="side-panel">
+        <h2>掌握清单</h2>
+        <div class="checks">
+    <label class="check-row" data-search="能解析 IPv4 首部长度、总长度、TTL、协议、源/目的 IP。">
+      <input type="checkbox" data-check="0">
+      <span>能解析 IPv4 首部长度、总长度、TTL、协议、源/目的 IP。</span>
+    </label>
+  
+    <label class="check-row" data-search="能按 MTU 计算分片长度、MF、片偏移。">
+      <input type="checkbox" data-check="1">
+      <span>能按 MTU 计算分片长度、MF、片偏移。</span>
+    </label>
+  
+    <label class="check-row" data-search="能做最长前缀匹配。">
+      <input type="checkbox" data-check="2">
+      <span>能做最长前缀匹配。</span>
+    </label>
+  
+    <label class="check-row" data-search="能按需求划分等长/不等长子网。">
+      <input type="checkbox" data-check="3">
+      <span>能按需求划分等长/不等长子网。</span>
+    </label>
+  
+    <label class="check-row" data-search="能描述 ARP 请求/应答和跨网段 MAC 变化。">
+      <input type="checkbox" data-check="4">
+      <span>能描述 ARP 请求/应答和跨网段 MAC 变化。</span>
+    </label>
+  
+    <label class="check-row" data-search="能写出 DHCP 四步和 UDP 传输。">
+      <input type="checkbox" data-check="5">
+      <span>能写出 DHCP 四步和 UDP 传输。</span>
+    </label>
+  
+    <label class="check-row" data-search="能说明 NAT 表项与地址转换。">
+      <input type="checkbox" data-check="6">
+      <span>能说明 NAT 表项与地址转换。</span>
+    </label>
+  
+    <label class="check-row" data-search="能区分 RIP、OSPF、BGP 的算法和作用域。">
+      <input type="checkbox" data-check="7">
+      <span>能区分 RIP、OSPF、BGP 的算法和作用域。</span>
+    </label>
+  </div>
+        <h2>我的补充</h2>
+        <textarea id="notes" placeholder="把你根据作业补充的题型、错因或例题写在这里。"></textarea>
+        <button id="copySummary" type="button">复制复习清单</button>
+        <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+const key = document.body.dataset.storage || "network-review";
+const state = JSON.parse(localStorage.getItem(key) || "{}");
+const checks = [...document.querySelectorAll("[data-check]")];
+const notes = document.getElementById("notes");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+let onlyUnmastered = false;
+
+function save() {
+  const mastered = checks.map((input) => input.checked);
+  localStorage.setItem(key, JSON.stringify({ mastered, notes: notes?.value || "" }));
+}
+
+function updateProgress() {
+  const done = checks.filter((input) => input.checked).length;
+  const total = checks.length || 1;
+  const percent = Math.round((done / total) * 100);
+  if (progressText) progressText.textContent = percent + "%";
+  if (progressBar) progressBar.style.width = percent + "%";
+  checks.forEach((input) => {
+    const row = input.closest(".check-row");
+    row?.classList.toggle("mastered", input.checked);
+    if (onlyUnmastered) row.hidden = input.checked;
+  });
+}
+
+checks.forEach((input, index) => {
+  input.checked = Boolean(state.mastered?.[index]);
+  input.addEventListener("change", () => {
+    save();
+    updateProgress();
+  });
+});
+if (notes) {
+  notes.value = state.notes || "";
+  notes.addEventListener("input", save);
+}
+updateProgress();
+
+document.querySelectorAll(".topic-head").forEach((button) => {
+  button.addEventListener("click", () => {
+    const body = button.parentElement.querySelector(".topic-body");
+    const isOpen = body.classList.toggle("open");
+    button.setAttribute("aria-expanded", String(isOpen));
+  });
+});
+
+document.querySelectorAll(".qa-question").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.parentElement.querySelector(".qa-answer")?.classList.toggle("open");
+  });
+});
+
+document.getElementById("expandAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.add("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "true"));
+});
+
+document.getElementById("collapseAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.remove("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "false"));
+});
+
+document.getElementById("toggleUnmastered")?.addEventListener("click", (event) => {
+  onlyUnmastered = !onlyUnmastered;
+  event.currentTarget.classList.toggle("active", onlyUnmastered);
+  updateProgress();
+});
+
+document.getElementById("searchInput")?.addEventListener("input", (event) => {
+  const q = event.target.value.trim().toLowerCase();
+  document.querySelectorAll("[data-search]").forEach((node) => {
+    node.hidden = q && !node.dataset.search.toLowerCase().includes(q);
+  });
+});
+
+document.getElementById("copySummary")?.addEventListener("click", async () => {
+  const pending = checks
+    .filter((input) => !input.checked)
+    .map((input) => "- " + input.closest(".check-row").innerText.trim())
+    .join("\n");
+  const text = [
+    document.querySelector("h1")?.innerText || "计算机网络复习",
+    "",
+    "未掌握清单:",
+    pending || "- 已全部勾选",
+    "",
+    "我的补充:",
+    notes?.value || ""
+  ].join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+  } catch {
+    document.getElementById("copyStatus").textContent = "浏览器限制复制，请手动选择文本。";
+  }
+});
+</script>
+</body>
+</html>

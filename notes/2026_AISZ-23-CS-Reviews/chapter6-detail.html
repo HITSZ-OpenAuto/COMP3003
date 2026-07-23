@@ -1,0 +1,1465 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第6章详细介绍：应用层 - 计算机网络复习</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body data-storage="network-review-detail-ch6">
+  <header class="topbar">
+    <a class="back-link" href="chapter6-summary.html">返回第6章总结</a>
+    <div class="title-block">
+      <p class="eyebrow">Chapter 6 Detail</p>
+      <h1>第6章详细介绍：应用层</h1>
+      <p>围绕作业三：DNS 查询与记录、HTTP/Cookie/缓存、SMTP/MIME、C/S 与 P2P 分发、Socket 调用。</p>
+    </div>
+    <div class="progress-panel">
+      <strong>6</strong>
+      <span>详细考点</span>
+    </div>
+  </header>
+
+  <main>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="" href="chapter1-summary.html">第1章</a><a class="" href="chapter2-summary.html">第2章</a><a class="" href="chapter3-summary.html">第3章</a><a class="" href="chapter4-summary.html">第4章</a><a class="" href="chapter5-summary.html">第5章</a><a class="active" href="chapter6-summary.html">第6章</a><a class="" href="chapter7-summary.html">第7章</a>
+    </nav>
+
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索详细页</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 IPv4 bit、MF、三次握手、MX">
+      </label>
+      <a class="tool-link" href="chapter6-summary.html">回到总结页</a>
+    </section>
+
+    <section class="detail-layout">
+      <aside class="detail-toc">
+        <h2>本页目录</h2>
+        
+    <a href="#detail-6-1">01 C/S、P2P 与混合结构：分发公式来自瓶颈</a>
+  
+    <a href="#detail-6-2">02 DNS 查询：主机递归，本地 DNS 对外迭代</a>
+  
+    <a href="#detail-6-3">03 DNS 资源记录：A、NS、CNAME、MX 的 name/value 怎么写</a>
+  
+    <a href="#detail-6-4">04 HTTP、Cookie 与 Web 缓存：无状态协议如何维护会话</a>
+  
+    <a href="#detail-6-5">05 SMTP 与 MIME：邮件传送状态和二进制附件</a>
+  
+    <a href="#detail-6-6">06 Socket 调用关系：客户端主动 connect，服务器被动 accept</a>
+  
+      </aside>
+      <div class="detail-main">
+        
+      <article id="detail-6-1" class="detail-card" data-search="C/S、P2P 与混合结构：分发公式来自瓶颈 考法：套 Dcs 和 Dp2p 公式，解释为什么 P2P 随 N 增大更可扩展。 应用体系结构描述应用进程如何组织通信；C/S 依赖中心服务器，P2P 中节点既下载也上传，混合结构结合两者。 C/S：服务器必须上传 N 份文件，且最慢客户端下载一份文件。 P2P：服务器至少上传 1 份文件，最慢 peer 至少下载 1 份文件，系统总上传能力为 us + Σui。 P2P 的自扩展性来自 peer 数增加时，总上传能力也增加。 C/S: Dcs &gt;= max(NF/us, F/dmin)。 P2P: Dp2p &gt;= max(F/us, F/dmin, NF/(us+Σui))。 单位必须统一：Gb/Mb/kb 不统一会直接错 1000 倍。 分发时间下界来自“至少要传多少 bit”和“瓶颈速率是多少”。 C/S 的服务器上传是集中瓶颈；P2P 把上传压力分摊给所有 peer。 作业三 F=15Gb、us=30Mbps、dmin=2Mbps 时，F/us=500s，F/dmin=7500s；N=100,u=1Mbps 时 P2P 第三个下界为 100F/(30Mbps+100Mbps)。">
+        <div class="detail-card-head">
+          <span>01</span>
+          <div>
+            <h2>C/S、P2P 与混合结构：分发公式来自瓶颈</h2>
+            <p>考法：套 Dcs 和 Dp2p 公式，解释为什么 P2P 随 N 增大更可扩展。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>应用体系结构描述应用进程如何组织通信；C/S 依赖中心服务器，P2P 中节点既下载也上传，混合结构结合两者。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>C/S：服务器必须上传 N 份文件，且最慢客户端下载一份文件。</li><li>P2P：服务器至少上传 1 份文件，最慢 peer 至少下载 1 份文件，系统总上传能力为 us + Σui。</li><li>P2P 的自扩展性来自 peer 数增加时，总上传能力也增加。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>C/S: Dcs &gt;= max(NF/us, F/dmin)。</li><li>P2P: Dp2p &gt;= max(F/us, F/dmin, NF/(us+Σui))。</li><li>单位必须统一：Gb/Mb/kb 不统一会直接错 1000 倍。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>分发时间下界来自“至少要传多少 bit”和“瓶颈速率是多少”。</li><li>C/S 的服务器上传是集中瓶颈；P2P 把上传压力分摊给所有 peer。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业三 F=15Gb、us=30Mbps、dmin=2Mbps 时，F/us=500s，F/dmin=7500s；N=100,u=1Mbps 时 P2P 第三个下界为 100F/(30Mbps+100Mbps)。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 760 260" role="img" aria-label="C/S 与 P2P 结构对比图">
+    <rect x="1" y="1" width="758" height="258" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="60" y="34" font-size="13" font-weight="900" fill="#1f7a4d">C/S</text>
+    <text x="430" y="34" font-size="13" font-weight="900" fill="#1f7a4d">P2P</text>
+    <rect x="44" y="58" width="272" height="168" rx="10" fill="#f7fbf8" stroke="#d8e2dc"/>
+    <rect x="414" y="58" width="302" height="168" rx="10" fill="#f7fbf8" stroke="#d8e2dc"/>
+    <circle cx="180" cy="100" r="28" fill="#eef6f1" stroke="#1f7a4d" stroke-width="2"/>
+    <text x="180" y="100" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="900" fill="#17201b">Server</text>
+    <circle cx="92" cy="176" r="21" fill="#ffffff" stroke="#b8cbc2"/>
+    <circle cx="180" cy="182" r="21" fill="#ffffff" stroke="#b8cbc2"/>
+    <circle cx="268" cy="176" r="21" fill="#ffffff" stroke="#b8cbc2"/>
+    <line x1="166" y1="123" x2="101" y2="158" stroke="#146c73" stroke-width="2" marker-end="url(#archArrow)"/>
+    <line x1="180" y1="130" x2="180" y2="160" stroke="#146c73" stroke-width="2" marker-end="url(#archArrow)"/>
+    <line x1="194" y1="123" x2="260" y2="158" stroke="#146c73" stroke-width="2" marker-end="url(#archArrow)"/>
+    <text x="180" y="214" text-anchor="middle" font-size="12" font-weight="700" fill="#5f6f66">服务器上传是核心瓶颈</text>
+    <circle cx="508" cy="108" r="24" fill="#ffffff" stroke="#b8cbc2"/>
+    <circle cx="614" cy="108" r="24" fill="#ffffff" stroke="#b8cbc2"/>
+    <circle cx="560" cy="180" r="24" fill="#ffffff" stroke="#b8cbc2"/>
+    <circle cx="666" cy="180" r="24" fill="#ffffff" stroke="#b8cbc2"/>
+    <text x="508" y="112" text-anchor="middle" font-size="12" font-weight="900" fill="#17201b">P1</text>
+    <text x="614" y="112" text-anchor="middle" font-size="12" font-weight="900" fill="#17201b">P2</text>
+    <text x="560" y="184" text-anchor="middle" font-size="12" font-weight="900" fill="#17201b">P3</text>
+    <text x="666" y="184" text-anchor="middle" font-size="12" font-weight="900" fill="#17201b">P4</text>
+    <path d="M 530 108 H 590 M 604 130 L 574 160 M 532 128 L 548 158 M 584 180 H 642" stroke="#146c73" stroke-width="2" marker-end="url(#archArrow)" fill="none"/>
+    <text x="566" y="214" text-anchor="middle" font-size="12" font-weight="700" fill="#5f6f66">节点越多, 上传能力也增加</text>
+    <defs>
+      <marker id="archArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+  </svg>
+        <figcaption>公式中的每一项都对应一个不可突破的瓶颈，不是凭空记忆。</figcaption>
+      </figure>
+    
+        
+        
+    <section class="interactive-box" data-tool="p2p">
+      <div class="interactive-head">
+        <h4>C/S 与 P2P 分发时间计算器</h4>
+        <p>输入作业三同类参数，页面会自动套 Dcs 和 Dp2p 公式。</p>
+      </div>
+      <div class="calc-grid">
+        <label>F 文件大小 (Gb)<input type="number" data-p2p="F" value="15" min="0" step="0.1"></label>
+        <label>N 对等方数量<input type="number" data-p2p="N" value="100" min="1" step="1"></label>
+        <label>us 服务器上传 (Mbps)<input type="number" data-p2p="us" value="30" min="0" step="0.1"></label>
+        <label>dmin 最慢下载 (Mbps)<input type="number" data-p2p="dmin" value="2" min="0" step="0.1"></label>
+        <label>每个 peer 上传 u (Mbps)<input type="number" data-p2p="u" value="1" min="0" step="0.1"></label>
+      </div>
+      <div class="calc-result" id="p2pResult"></div>
+    </section>
+  
+      </article>
+    
+      <article id="detail-6-2" class="detail-card" data-search="DNS 查询：主机递归，本地 DNS 对外迭代 考法：写 H1 获取 www.xyz.com IP 的完整过程，区分根/TLD/权威服务器和缓存。 DNS 是分布式层次数据库和应用层协议，用资源记录把域名映射到 IP、别名、邮件服务器或权威服务器。 主机通常向本地 DNS 发递归查询：希望本地 DNS 直接返回最终答案。 本地 DNS 缓存未命中时，通常对根、TLD、权威 DNS 做迭代查询。 缓存带 TTL，短时间再次访问可跳过完整根/TLD/权威查询路径。 过程题按 8 步写：H1-&gt;本地、 本地-&gt;根、根返回 TLD、本地-&gt;TLD、TLD 返回权威、本地-&gt;权威、权威返回 A、本地返回 H1。 不要写根服务器直接返回 www 的 IP；根通常返回 TLD 服务器线索。 如果题目说缓存为空，第一次必须完整查询；再次访问才强调缓存。 层次结构避免单点数据库过大，也便于分布式管理域名。 缓存降低延迟和上级 DNS 负载，但 TTL 保证记录变化后最终能更新。 作业三中 D1 缓存为空时，D1 先问根得到 .com 的 D2，再问 D2 得到 dns.xyz.com，最后问 dns.xyz.com 得到 www.xyz.com 的 A 记录。">
+        <div class="detail-card-head">
+          <span>02</span>
+          <div>
+            <h2>DNS 查询：主机递归，本地 DNS 对外迭代</h2>
+            <p>考法：写 H1 获取 www.xyz.com IP 的完整过程，区分根/TLD/权威服务器和缓存。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>DNS 是分布式层次数据库和应用层协议，用资源记录把域名映射到 IP、别名、邮件服务器或权威服务器。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>主机通常向本地 DNS 发递归查询：希望本地 DNS 直接返回最终答案。</li><li>本地 DNS 缓存未命中时，通常对根、TLD、权威 DNS 做迭代查询。</li><li>缓存带 TTL，短时间再次访问可跳过完整根/TLD/权威查询路径。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>过程题按 8 步写：H1-&gt;本地、 本地-&gt;根、根返回 TLD、本地-&gt;TLD、TLD 返回权威、本地-&gt;权威、权威返回 A、本地返回 H1。</li><li>不要写根服务器直接返回 www 的 IP；根通常返回 TLD 服务器线索。</li><li>如果题目说缓存为空，第一次必须完整查询；再次访问才强调缓存。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>层次结构避免单点数据库过大，也便于分布式管理域名。</li><li>缓存降低延迟和上级 DNS 负载，但 TTL 保证记录变化后最终能更新。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业三中 D1 缓存为空时，D1 先问根得到 .com 的 D2，再问 D2 得到 dns.xyz.com，最后问 dns.xyz.com 得到 www.xyz.com 的 A 记录。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 530" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="528" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">H1</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="192" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="244" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">本地 DNS D1</tspan>
+  </text>
+    <line x1="244" y1="50" x2="244" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="378" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="430" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">根 DNS</tspan>
+  </text>
+    <line x1="430" y1="50" x2="430" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="564" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="616" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="616" dy="0">.com TLD D2</tspan>
+  </text>
+    <line x1="616" y1="50" x2="616" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">权威 dns.xyz.com</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="244" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="151" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="151" dy="0">递归查询</tspan>
+  </text>
+      <text x="151" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="151" dy="0">www.xyz.com?</tspan>
+  </text>
+    
+      <line x1="244" y1="130" x2="430" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="337" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="337" dy="0">迭代查询</tspan>
+  </text>
+      <text x="337" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="337" dy="0">根: 谁管 .com?</tspan>
+  </text>
+    
+      <line x1="430" y1="184" x2="244" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="337" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="337" dy="0">返回 TLD</tspan>
+  </text>
+      <text x="337" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="337" dy="0">.com DNS 信息</tspan>
+  </text>
+    
+      <line x1="244" y1="238" x2="616" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">迭代查询</tspan>
+  </text>
+      <text x="430" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">谁管 xyz.com?</tspan>
+  </text>
+    
+      <line x1="616" y1="292" x2="244" y2="292" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="282" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">返回 NS + glue A</tspan>
+  </text>
+      <text x="430" y="309" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">dns.xyz.com / 130.20.4.18</tspan>
+  </text>
+    
+      <line x1="244" y1="346" x2="802" y2="346" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="523" y="336" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="523" dy="0">查询 A</tspan>
+  </text>
+      <text x="523" y="363" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="523" dy="0">www.xyz.com?</tspan>
+  </text>
+    
+      <line x1="802" y1="400" x2="244" y2="400" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="523" y="390" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="523" dy="0">返回 A</tspan>
+  </text>
+      <text x="523" y="417" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="523" dy="0">130.20.5.10</tspan>
+  </text>
+    
+      <line x1="244" y1="454" x2="58" y2="454" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="151" y="444" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="151" dy="0">缓存并返回</tspan>
+  </text>
+      <text x="151" y="471" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="151" dy="0">H1 获得 IP</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>图中故意标清“递归”和“迭代”，这是 DNS 过程题的得分点。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>DNS 查询状态转移</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>实体</th><th>状态</th><th>事件</th><th>动作</th><th>下一状态/原因</th></tr></thead>
+          <tbody>
+            <tr><td>主机</td><td>需要解析</td><td>应用请求域名</td><td>问本地 DNS</td><td>等待最终答案</td></tr><tr><td>本地 DNS</td><td>查缓存</td><td>缓存命中</td><td>直接返回</td><td>减少延迟</td></tr><tr><td>本地 DNS</td><td>查缓存</td><td>缓存未命中</td><td>问根 DNS</td><td>迭代查询</td></tr><tr><td>本地 DNS</td><td>迭代中</td><td>收到下一跳 DNS 信息</td><td>继续问 TLD/权威</td><td>逐级定位权威</td></tr><tr><td>本地 DNS</td><td>得到 A 记录</td><td>收到权威答案</td><td>缓存并返回主机</td><td>后续访问更快</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-6-3" class="detail-card" data-search="DNS 资源记录：A、NS、CNAME、MX 的 name/value 怎么写 考法：注册 xyz.com 时在 .com TLD 和权威 DNS 中分别添加哪些记录。 DNS 资源记录 RR 形式为 (name, value, type, ttl)，type 决定 name 和 value 的语义。 A：主机名 -&gt; IPv4 地址。 NS：域名 -&gt; 该域权威 DNS 服务器名；通常还要给权威 DNS 服务器名配 A 记录。 MX：邮件域 -&gt; 邮件服务器主机名；邮件服务器主机名也需要 A 记录。 CNAME：别名 -&gt; 规范主机名。 先判断记录放在哪一级 DNS：TLD 中放委派记录，权威 DNS 中放本域服务记录。 Web 服务器通常写 www 的 A 记录。 邮件要两条：域的 MX + 邮件服务器主机名的 A。 NS 记录解决“谁负责这个域”，A 记录解决“这台服务器在哪里”。 MX 不直接写 IP，而是写邮件服务器名，便于更换服务器地址。 作业三：.com TLD 中插入 (xyz.com, dns.xyz.com, NS) 和 (dns.xyz.com, 130.20.4.18, A)；xyz.com 权威 DNS 中插入 www 的 A、xyz.com 的 MX、mail.xyz.com 的 A。">
+        <div class="detail-card-head">
+          <span>03</span>
+          <div>
+            <h2>DNS 资源记录：A、NS、CNAME、MX 的 name/value 怎么写</h2>
+            <p>考法：注册 xyz.com 时在 .com TLD 和权威 DNS 中分别添加哪些记录。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>DNS 资源记录 RR 形式为 (name, value, type, ttl)，type 决定 name 和 value 的语义。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>A：主机名 -&gt; IPv4 地址。</li><li>NS：域名 -&gt; 该域权威 DNS 服务器名；通常还要给权威 DNS 服务器名配 A 记录。</li><li>MX：邮件域 -&gt; 邮件服务器主机名；邮件服务器主机名也需要 A 记录。</li><li>CNAME：别名 -&gt; 规范主机名。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>先判断记录放在哪一级 DNS：TLD 中放委派记录，权威 DNS 中放本域服务记录。</li><li>Web 服务器通常写 www 的 A 记录。</li><li>邮件要两条：域的 MX + 邮件服务器主机名的 A。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>NS 记录解决“谁负责这个域”，A 记录解决“这台服务器在哪里”。</li><li>MX 不直接写 IP，而是写邮件服务器名，便于更换服务器地址。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业三：.com TLD 中插入 (xyz.com, dns.xyz.com, NS) 和 (dns.xyz.com, 130.20.4.18, A)；xyz.com 权威 DNS 中插入 www 的 A、xyz.com 的 MX、mail.xyz.com 的 A。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 310" role="img" aria-label="DNS 记录放置位置图">
+    <rect x="1" y="1" width="898" height="308" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="34" y="32" font-size="14" font-weight="900" fill="#1f7a4d">xyz.com 注册与业务记录</text>
+    <rect x="56" y="64" width="340" height="190" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="226" y="92" text-anchor="middle" font-size="14" font-weight="900">.com TLD DNS</text>
+    <text x="84" y="130" font-size="12" font-weight="850">xyz.com NS dns.xyz.com</text>
+    <text x="84" y="166" font-size="12" font-weight="850">dns.xyz.com A 130.20.4.18</text>
+    <text x="84" y="216" font-size="12" font-weight="750" fill="#5f6f66">作用：告诉查询者 xyz.com 的权威 DNS 是谁，以及这台 DNS 的 IP。</text>
+    <rect x="504" y="64" width="340" height="190" rx="8" fill="#fff6e8" stroke="#e7c9a3"/>
+    <text x="674" y="92" text-anchor="middle" font-size="14" font-weight="900">xyz.com 权威 DNS</text>
+    <text x="532" y="130" font-size="12" font-weight="850">www.xyz.com A 130.20.5.10</text>
+    <text x="532" y="166" font-size="12" font-weight="850">xyz.com MX mail.xyz.com</text>
+    <text x="532" y="202" font-size="12" font-weight="850">mail.xyz.com A 130.20.4.20</text>
+    <text x="450" y="282" text-anchor="middle" font-size="12" font-weight="850" fill="#5f6f66">委派记录放 TLD；Web/邮件等本域服务记录放权威 DNS。</text>
+  </svg>
+        <figcaption>记录题不要把 TLD 的委派记录和权威 DNS 的业务记录混在一起。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>常考 RR 类型</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Type</th><th>name</th><th>value</th><th>典型用途</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>主机名</td><td>IPv4 地址</td><td>www.xyz.com -&gt; 130.20.5.10</td></tr><tr><td>NS</td><td>域名</td><td>权威 DNS 主机名</td><td>xyz.com -&gt; dns.xyz.com</td></tr><tr><td>CNAME</td><td>别名</td><td>规范主机名</td><td>www -&gt; server.example.com</td></tr><tr><td>MX</td><td>邮件域</td><td>邮件服务器主机名</td><td>xyz.com -&gt; mail.xyz.com</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-6-4" class="detail-card" data-search="HTTP、Cookie 与 Web 缓存：无状态协议如何维护会话 考法：HTTP 非持久/持久连接、Cookie 四个组成部分、条件 GET 和 304。 HTTP 是基于请求/响应的应用层协议，协议本身无状态；Cookie 和服务器端状态让 Web 应用能识别会话。 非持久 HTTP：每个对象单独 TCP 连接，单对象约 2RTT + 传输时间。 持久 HTTP：复用 TCP 连接，减少重复握手和慢启动开销。 Cookie 机制包括响应头 Set-Cookie、请求头 Cookie、客户端保存、服务器数据库。 Web 缓存用条件 GET：If-Modified-Since/ETag；未修改可返回 304。 问 HTTP 是否有状态：答协议无状态，但 Cookie 可在其上维护会话。 问访问延迟：先判断是否含 DNS、是否需要 TCP 建连、是否持久连接。 缓存题写清命中直接返回、过期/验证时条件 GET、未修改 304。 无状态让服务器协议逻辑简单、易扩展。 Cookie 把会话标识放到后续请求里，避免每个请求都重新登录。 缓存减少源服务器负载和接入链路流量。 浏览器首次访问收到 Set-Cookie: id=...；之后同站点请求带 Cookie: id=...，服务器据此找到购物车或登录状态。">
+        <div class="detail-card-head">
+          <span>04</span>
+          <div>
+            <h2>HTTP、Cookie 与 Web 缓存：无状态协议如何维护会话</h2>
+            <p>考法：HTTP 非持久/持久连接、Cookie 四个组成部分、条件 GET 和 304。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>HTTP 是基于请求/响应的应用层协议，协议本身无状态；Cookie 和服务器端状态让 Web 应用能识别会话。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>非持久 HTTP：每个对象单独 TCP 连接，单对象约 2RTT + 传输时间。</li><li>持久 HTTP：复用 TCP 连接，减少重复握手和慢启动开销。</li><li>Cookie 机制包括响应头 Set-Cookie、请求头 Cookie、客户端保存、服务器数据库。</li><li>Web 缓存用条件 GET：If-Modified-Since/ETag；未修改可返回 304。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>问 HTTP 是否有状态：答协议无状态，但 Cookie 可在其上维护会话。</li><li>问访问延迟：先判断是否含 DNS、是否需要 TCP 建连、是否持久连接。</li><li>缓存题写清命中直接返回、过期/验证时条件 GET、未修改 304。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>无状态让服务器协议逻辑简单、易扩展。</li><li>Cookie 把会话标识放到后续请求里，避免每个请求都重新登录。</li><li>缓存减少源服务器负载和接入链路流量。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>浏览器首次访问收到 Set-Cookie: id=...；之后同站点请求带 Cookie: id=...，服务器据此找到购物车或登录状态。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 476" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="474" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">浏览器</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="454" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="378" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="430" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Web 服务器</tspan>
+  </text>
+    <line x1="430" y1="50" x2="430" y2="454" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">Web 缓存</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="454" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="430" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="244" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">GET /</tspan>
+  </text>
+      <text x="244" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="244" dy="0">首次请求, 无 Cookie</tspan>
+  </text>
+    
+      <line x1="430" y1="130" x2="58" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="244" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">200 OK + Set-Cookie</tspan>
+  </text>
+      <text x="244" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="244" dy="0">分配会话 ID</tspan>
+  </text>
+    
+      <line x1="58" y1="184" x2="430" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="244" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">GET + Cookie</tspan>
+  </text>
+      <text x="244" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="244" dy="0">后续请求携带 ID</tspan>
+  </text>
+    
+      <line x1="58" y1="238" x2="802" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">GET 对象</tspan>
+  </text>
+      <text x="430" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">可先问缓存</tspan>
+  </text>
+    
+      <line x1="802" y1="292" x2="430" y2="292" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="616" y="282" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="616" dy="0">If-Modified-Since/ETag</tspan>
+  </text>
+      <text x="616" y="309" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="616" dy="0">验证缓存是否新鲜</tspan>
+  </text>
+    
+      <line x1="430" y1="346" x2="802" y2="346" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="616" y="336" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="616" dy="0">304 Not Modified</tspan>
+  </text>
+      <text x="616" y="363" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="616" dy="0">未修改则无需传对象</tspan>
+  </text>
+    
+      <line x1="802" y1="400" x2="58" y2="400" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="390" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">返回缓存副本</tspan>
+  </text>
+      <text x="430" y="417" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">降低延迟和外链流量</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>Cookie 不改变 HTTP 无状态本质，它只是让每次请求携带会话线索。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-6-5" class="detail-card" data-search="SMTP 与 MIME：邮件传送状态和二进制附件 考法：SMTP 三阶段、TCP/25、push/pull 区分、MIME 为什么需要。 SMTP 是邮件服务器之间推送邮件的应用层协议；MIME 扩展邮件格式，使非 ASCII 文本和附件可以通过邮件系统传输。 SMTP 基于 TCP，服务器熟知端口 25，采用命令/响应交互。 三阶段：连接建立、邮件传送、连接释放。 原始 SMTP 面向 7 位 ASCII；MIME 用 Content-Type、Content-Transfer-Encoding 等头部描述和编码附件。 过程题写：TCP 建连 -&gt; 220/HELO(EHLO) -&gt; MAIL FROM -&gt; RCPT TO -&gt; DATA -&gt; . -&gt; QUIT。 问为什么用 TCP：邮件要求可靠、按序、完整传输。 问附件：写 MIME + Base64 等编码 + 接收端解码恢复。 SMTP 是 push，因为发送方邮件服务器主动把邮件推到接收方邮件服务器。 用户读取邮件通常是 pull，例如 POP3/IMAP/HTTP。 MIME 让原本只适合文本的邮件协议能传图片、文档和多部分内容。 作业三 project.doc 附件会作为 MIME part，带 Content-Type: application/msword 和 Content-Transfer-Encoding: base64，经过 SMTP 文本通道传输。">
+        <div class="detail-card-head">
+          <span>05</span>
+          <div>
+            <h2>SMTP 与 MIME：邮件传送状态和二进制附件</h2>
+            <p>考法：SMTP 三阶段、TCP/25、push/pull 区分、MIME 为什么需要。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>SMTP 是邮件服务器之间推送邮件的应用层协议；MIME 扩展邮件格式，使非 ASCII 文本和附件可以通过邮件系统传输。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>SMTP 基于 TCP，服务器熟知端口 25，采用命令/响应交互。</li><li>三阶段：连接建立、邮件传送、连接释放。</li><li>原始 SMTP 面向 7 位 ASCII；MIME 用 Content-Type、Content-Transfer-Encoding 等头部描述和编码附件。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>过程题写：TCP 建连 -&gt; 220/HELO(EHLO) -&gt; MAIL FROM -&gt; RCPT TO -&gt; DATA -&gt; . -&gt; QUIT。</li><li>问为什么用 TCP：邮件要求可靠、按序、完整传输。</li><li>问附件：写 MIME + Base64 等编码 + 接收端解码恢复。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>SMTP 是 push，因为发送方邮件服务器主动把邮件推到接收方邮件服务器。</li><li>用户读取邮件通常是 pull，例如 POP3/IMAP/HTTP。</li><li>MIME 让原本只适合文本的邮件协议能传图片、文档和多部分内容。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业三 project.doc 附件会作为 MIME part，带 Content-Type: application/msword 和 Content-Transfer-Encoding: base64，经过 SMTP 文本通道传输。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 530" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="528" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">发送方邮件服务器</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">接收方邮件服务器</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="508" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="802" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">TCP connect :25</tspan>
+  </text>
+      <text x="430" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">连接建立</tspan>
+  </text>
+    
+      <line x1="802" y1="130" x2="58" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">220 Ready</tspan>
+  </text>
+      <text x="430" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">服务就绪</tspan>
+  </text>
+    
+      <line x1="58" y1="184" x2="802" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">HELO/EHLO</tspan>
+  </text>
+      <text x="430" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">声明身份/扩展</tspan>
+  </text>
+    
+      <line x1="58" y1="238" x2="802" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">MAIL FROM</tspan>
+  </text>
+      <text x="430" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">信封发件人</tspan>
+  </text>
+    
+      <line x1="58" y1="292" x2="802" y2="292" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="282" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">RCPT TO</tspan>
+  </text>
+      <text x="430" y="309" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">信封收件人</tspan>
+  </text>
+    
+      <line x1="58" y1="346" x2="802" y2="346" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="336" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">DATA + MIME 内容</tspan>
+  </text>
+      <text x="430" y="363" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">正文和附件编码</tspan>
+  </text>
+    
+      <line x1="58" y1="400" x2="802" y2="400" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="390" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">.</tspan>
+  </text>
+      <text x="430" y="417" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">正文结束</tspan>
+  </text>
+    
+      <line x1="58" y1="454" x2="802" y2="454" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="444" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">QUIT</tspan>
+  </text>
+      <text x="430" y="471" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">连接释放</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>SMTP 状态图要写命令顺序；MIME 是 DATA 阶段里的邮件内容格式。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>SMTP 客户端状态转移</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>状态</th><th>收到/完成</th><th>发送动作</th><th>下一状态</th><th>原因</th></tr></thead>
+          <tbody>
+            <tr><td>连接建立</td><td>TCP 连接成功且服务器 220</td><td>HELO/EHLO</td><td>身份声明</td><td>协商扩展能力</td></tr><tr><td>身份声明</td><td>服务器 250</td><td>MAIL FROM</td><td>发送发件人</td><td>指定信封发送方</td></tr><tr><td>发送发件人</td><td>服务器 250</td><td>RCPT TO</td><td>发送收件人</td><td>可多个收件人</td></tr><tr><td>发送收件人</td><td>服务器 250</td><td>DATA</td><td>传送内容</td><td>进入邮件正文</td></tr><tr><td>传送内容</td><td>正文以单独 . 结束</td><td>QUIT</td><td>连接释放</td><td>完成邮件传送</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-6-6" class="detail-card" data-search="Socket 调用关系：客户端主动 connect，服务器被动 accept 考法：实验/概念题问 TCP 客户端和服务器端 socket 调用顺序。 Socket 是应用进程使用传输层服务的接口；TCP 服务器监听端口并接受连接，客户端主动连接服务器。 服务器：socket -&gt; bind -&gt; listen -&gt; accept -&gt; recv/send -&gt; close。 客户端：socket -&gt; connect -&gt; send/recv -&gt; close。 accept 返回的是新的连接 socket；监听 socket 继续留着接收后续连接。 bind 绑定本地 IP/端口；listen 把 socket 变成监听状态。 connect 触发 TCP 三次握手；accept 在连接建立后返回。 不要用监听 socket 直接和某个客户端收发应用数据。 分离监听 socket 和连接 socket，让一个服务器端口能同时服务多个客户端。 客户端主动 connect 与服务器被动 accept 对应 TCP 主动打开/被动打开。 HTTP 服务器 bind 到 0.0.0.0:80 并 listen；浏览器 connect 到服务器 IP:80 后，服务器 accept 得到连接 socket 处理该请求。">
+        <div class="detail-card-head">
+          <span>06</span>
+          <div>
+            <h2>Socket 调用关系：客户端主动 connect，服务器被动 accept</h2>
+            <p>考法：实验/概念题问 TCP 客户端和服务器端 socket 调用顺序。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>Socket 是应用进程使用传输层服务的接口；TCP 服务器监听端口并接受连接，客户端主动连接服务器。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>服务器：socket -&gt; bind -&gt; listen -&gt; accept -&gt; recv/send -&gt; close。</li><li>客户端：socket -&gt; connect -&gt; send/recv -&gt; close。</li><li>accept 返回的是新的连接 socket；监听 socket 继续留着接收后续连接。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>bind 绑定本地 IP/端口；listen 把 socket 变成监听状态。</li><li>connect 触发 TCP 三次握手；accept 在连接建立后返回。</li><li>不要用监听 socket 直接和某个客户端收发应用数据。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>分离监听 socket 和连接 socket，让一个服务器端口能同时服务多个客户端。</li><li>客户端主动 connect 与服务器被动 accept 对应 TCP 主动打开/被动打开。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>HTTP 服务器 bind 到 0.0.0.0:80 并 listen；浏览器 connect 到服务器 IP:80 后，服务器 accept 得到连接 socket 处理该请求。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 422" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="420" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">客户端程序</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="400" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">服务器程序</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="400" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+        <path d="M 802 76 H 760 V 98 H 802" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="740" y="66" text-anchor="end" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="740" dy="0">socket/bind/listen</tspan>
+  </text>
+        <text x="740" y="94" text-anchor="end" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="740" dy="0">被动打开</tspan>
+  </text>
+      
+        <path d="M 58 130 H 100 V 152 H 58" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="120" y="120" text-anchor="start" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="120" dy="0">socket</tspan>
+  </text>
+        <text x="120" y="148" text-anchor="start" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="120" dy="0">准备主动打开</tspan>
+  </text>
+      
+      <line x1="58" y1="184" x2="802" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">connect</tspan>
+  </text>
+      <text x="430" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">触发 TCP 握手</tspan>
+  </text>
+    
+        <path d="M 802 238 H 760 V 260 H 802" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="740" y="228" text-anchor="end" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="740" dy="0">accept 返回</tspan>
+  </text>
+        <text x="740" y="256" text-anchor="end" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="740" dy="0">新连接 socket</tspan>
+  </text>
+      
+      <line x1="58" y1="292" x2="802" y2="292" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="282" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">send/recv</tspan>
+  </text>
+      <text x="430" y="309" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">交换应用报文</tspan>
+  </text>
+    
+      <line x1="58" y1="346" x2="802" y2="346" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="336" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">close</tspan>
+  </text>
+      <text x="430" y="363" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">释放连接</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>Socket 图和三次握手是同一过程的应用编程视角。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      </div>
+    </section>
+  </main>
+
+  <script>
+const key = document.body.dataset.storage || "network-review";
+const state = JSON.parse(localStorage.getItem(key) || "{}");
+const checks = [...document.querySelectorAll("[data-check]")];
+const notes = document.getElementById("notes");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+let onlyUnmastered = false;
+
+function save() {
+  const mastered = checks.map((input) => input.checked);
+  localStorage.setItem(key, JSON.stringify({ mastered, notes: notes?.value || "" }));
+}
+
+function updateProgress() {
+  const done = checks.filter((input) => input.checked).length;
+  const total = checks.length || 1;
+  const percent = Math.round((done / total) * 100);
+  if (progressText) progressText.textContent = percent + "%";
+  if (progressBar) progressBar.style.width = percent + "%";
+  checks.forEach((input) => {
+    const row = input.closest(".check-row");
+    row?.classList.toggle("mastered", input.checked);
+    if (onlyUnmastered) row.hidden = input.checked;
+  });
+}
+
+checks.forEach((input, index) => {
+  input.checked = Boolean(state.mastered?.[index]);
+  input.addEventListener("change", () => {
+    save();
+    updateProgress();
+  });
+});
+if (notes) {
+  notes.value = state.notes || "";
+  notes.addEventListener("input", save);
+}
+updateProgress();
+
+document.querySelectorAll(".topic-head").forEach((button) => {
+  button.addEventListener("click", () => {
+    const body = button.parentElement.querySelector(".topic-body");
+    const isOpen = body.classList.toggle("open");
+    button.setAttribute("aria-expanded", String(isOpen));
+  });
+});
+
+document.querySelectorAll(".qa-question").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.parentElement.querySelector(".qa-answer")?.classList.toggle("open");
+  });
+});
+
+document.getElementById("expandAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.add("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "true"));
+});
+
+document.getElementById("collapseAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.remove("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "false"));
+});
+
+document.getElementById("toggleUnmastered")?.addEventListener("click", (event) => {
+  onlyUnmastered = !onlyUnmastered;
+  event.currentTarget.classList.toggle("active", onlyUnmastered);
+  updateProgress();
+});
+
+document.getElementById("searchInput")?.addEventListener("input", (event) => {
+  const q = event.target.value.trim().toLowerCase();
+  document.querySelectorAll("[data-search]").forEach((node) => {
+    node.hidden = q && !node.dataset.search.toLowerCase().includes(q);
+  });
+});
+
+document.getElementById("copySummary")?.addEventListener("click", async () => {
+  const pending = checks
+    .filter((input) => !input.checked)
+    .map((input) => "- " + input.closest(".check-row").innerText.trim())
+    .join("\n");
+  const text = [
+    document.querySelector("h1")?.innerText || "计算机网络复习",
+    "",
+    "未掌握清单:",
+    pending || "- 已全部勾选",
+    "",
+    "我的补充:",
+    notes?.value || ""
+  ].join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+  } catch {
+    document.getElementById("copyStatus").textContent = "浏览器限制复制，请手动选择文本。";
+  }
+});
+
+function formatSeconds(value) {
+  if (!Number.isFinite(value)) return "无法计算";
+  if (value >= 3600) return (value / 3600).toFixed(2) + " h";
+  if (value >= 60) return (value / 60).toFixed(2) + " min";
+  return value.toFixed(2) + " s";
+}
+
+function updateP2P() {
+  const box = document.querySelector('[data-tool="p2p"]');
+  if (!box) return;
+  const read = (name) => Number(box.querySelector('[data-p2p="' + name + '"]')?.value || 0);
+  const Fbits = read("F") * 1e9;
+  const N = read("N");
+  const us = read("us") * 1e6;
+  const dmin = read("dmin") * 1e6;
+  const u = read("u") * 1e6;
+  const sumPeer = N * u;
+  const dcs = Math.max((N * Fbits) / us, Fbits / dmin);
+  const dp2p = Math.max(Fbits / us, Fbits / dmin, (N * Fbits) / (us + sumPeer));
+  const serverTerm = (N * Fbits) / us;
+  const result = box.querySelector("#p2pResult");
+  if (result) {
+    result.innerHTML = [
+      "Dcs = max(NF/us, F/dmin) = " + formatSeconds(dcs),
+      "Dp2p = max(F/us, F/dmin, NF/(us+N*u)) = " + formatSeconds(dp2p),
+      "C/S 服务器上传项 NF/us = " + formatSeconds(serverTerm)
+    ].join("<br>");
+  }
+}
+
+document.querySelectorAll("[data-p2p]").forEach((input) => {
+  input.addEventListener("input", updateP2P);
+});
+updateP2P();
+</script>
+</body>
+</html>

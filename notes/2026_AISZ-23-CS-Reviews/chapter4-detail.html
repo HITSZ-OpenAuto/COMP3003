@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第4章详细介绍：网络层 - 计算机网络复习</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body data-storage="network-review-detail-ch4">
+  <header class="topbar">
+    <a class="back-link" href="chapter4-summary.html">返回第4章总结</a>
+    <div class="title-block">
+      <p class="eyebrow">Chapter 4 Detail</p>
+      <h1>第4章详细介绍：网络层</h1>
+      <p>围绕作业二：逐 bit 读 IPv4、分片字段、最长前缀、子网、ARP/DHCP/NAT 与路由协议。</p>
+    </div>
+    <div class="progress-panel">
+      <strong>8</strong>
+      <span>详细考点</span>
+    </div>
+  </header>
+
+  <main>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="" href="chapter1-summary.html">第1章</a><a class="" href="chapter2-summary.html">第2章</a><a class="" href="chapter3-summary.html">第3章</a><a class="active" href="chapter4-summary.html">第4章</a><a class="" href="chapter5-summary.html">第5章</a><a class="" href="chapter6-summary.html">第6章</a><a class="" href="chapter7-summary.html">第7章</a>
+    </nav>
+
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索详细页</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 IPv4 bit、MF、三次握手、MX">
+      </label>
+      <a class="tool-link" href="chapter4-summary.html">回到总结页</a>
+    </section>
+
+    <section class="detail-layout">
+      <aside class="detail-toc">
+        <h2>本页目录</h2>
+        
+    <a href="#detail-4-1">01 IPv4 首部逐 bit 读取</a>
+  
+    <a href="#detail-4-2">02 Flags + Fragment Offset：不要把 3 bit Flags 都叫 MF</a>
+  
+    <a href="#detail-4-3">03 最长前缀、子网与 CIDR：按 bit 比，不按十进制感觉猜</a>
+  
+    <a href="#detail-4-4">04 ARP：同网段解析下一跳 MAC</a>
+  
+    <a href="#detail-4-5">05 DHCP：DORA 状态过程</a>
+  
+    <a href="#detail-4-6">06 NAT：出站改源，回包改目的</a>
+  
+    <a href="#detail-4-7">07 RIP、OSPF、BGP：算法、范围和更新状态</a>
+  
+    <a href="#detail-4-8">08 IPv6、隧道与分片：作业二最后一题</a>
+  
+      </aside>
+      <div class="detail-main">
+        
+      <article id="detail-4-1" class="detail-card" data-search="IPv4 首部逐 bit 读取 考法：给十六进制首部，要求读 IHL、Total Length、Flags/Offset、TTL、Protocol、源/目的 IP。 IPv4 首部最小 20B，由多个固定字段组成；首部长度字段 IHL 决定首部实际长度，Total Length 决定整个 IP 数据报长度。 Version 4bit：IPv4 值为 4；IHL 4bit，单位是 4B，IHL=5 表示 20B。 Total Length 16bit：IP 首部 + IP 数据的总字节数，不包含以太网头尾。 TTL 8bit 每过一个路由器减 1；Protocol 8bit 指示上层协议，TCP=6、UDP=17、ICMP=1。 Source IP 和 Destination IP 各 32bit，按 4 个字节转十进制点分格式。 先把首字节拆成高 4bit Version 和低 4bit IHL。 再读 Total Length：两个字节十六进制转十进制。 数据长度 = Total Length - IHL*4。 最后读 TTL、Protocol、Checksum、源/目的 IP；不要把链路层填充算进 IP 总长度。 IHL 允许 IPv4 带可变长度选项；Total Length 让接收方知道 IP 数据报到哪里结束。 TTL 防止路由环路中的数据报永远存在；Protocol 让 IP 能把数据交给正确上层协议。 作业二中 Total_len=0x0054=84B，IHL=5，所以首部 20B，IP 数据部分长度为 84-20=64B。">
+        <div class="detail-card-head">
+          <span>01</span>
+          <div>
+            <h2>IPv4 首部逐 bit 读取</h2>
+            <p>考法：给十六进制首部，要求读 IHL、Total Length、Flags/Offset、TTL、Protocol、源/目的 IP。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>IPv4 首部最小 20B，由多个固定字段组成；首部长度字段 IHL 决定首部实际长度，Total Length 决定整个 IP 数据报长度。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>Version 4bit：IPv4 值为 4；IHL 4bit，单位是 4B，IHL=5 表示 20B。</li><li>Total Length 16bit：IP 首部 + IP 数据的总字节数，不包含以太网头尾。</li><li>TTL 8bit 每过一个路由器减 1；Protocol 8bit 指示上层协议，TCP=6、UDP=17、ICMP=1。</li><li>Source IP 和 Destination IP 各 32bit，按 4 个字节转十进制点分格式。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>先把首字节拆成高 4bit Version 和低 4bit IHL。</li><li>再读 Total Length：两个字节十六进制转十进制。</li><li>数据长度 = Total Length - IHL*4。</li><li>最后读 TTL、Protocol、Checksum、源/目的 IP；不要把链路层填充算进 IP 总长度。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>IHL 允许 IPv4 带可变长度选项；Total Length 让接收方知道 IP 数据报到哪里结束。</li><li>TTL 防止路由环路中的数据报永远存在；Protocol 让 IP 能把数据交给正确上层协议。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业二中 Total_len=0x0054=84B，IHL=5，所以首部 20B，IP 数据部分长度为 84-20=64B。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 584" role="img" aria-label="IPv4 标准首部字段">
+    <rect x="1" y="1" width="898" height="582" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="54" y="22" font-size="13" font-weight="900" fill="#1f7a4d">IPv4 标准首部字段</text>
+    <text x="876" y="22" text-anchor="end" font-size="11" font-weight="800" fill="#5f6f66">每行 32 bit，数字为 bit 位置</text>
+    
+      <line x1="54" y1="38" x2="54" y2="52" stroke="#b8cbc2"/>
+      <text x="54" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">0</text>
+    
+      <line x1="131.0625" y1="38" x2="131.0625" y2="52" stroke="#b8cbc2"/>
+      <text x="131.0625" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">3</text>
+    
+      <line x1="156.75" y1="38" x2="156.75" y2="52" stroke="#b8cbc2"/>
+      <text x="156.75" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">4</text>
+    
+      <line x1="233.8125" y1="38" x2="233.8125" y2="52" stroke="#b8cbc2"/>
+      <text x="233.8125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">7</text>
+    
+      <line x1="259.5" y1="38" x2="259.5" y2="52" stroke="#b8cbc2"/>
+      <text x="259.5" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">8</text>
+    
+      <line x1="439.3125" y1="38" x2="439.3125" y2="52" stroke="#b8cbc2"/>
+      <text x="439.3125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">15</text>
+    
+      <line x1="465" y1="38" x2="465" y2="52" stroke="#b8cbc2"/>
+      <text x="465" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">16</text>
+    
+      <line x1="644.8125" y1="38" x2="644.8125" y2="52" stroke="#b8cbc2"/>
+      <text x="644.8125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">23</text>
+    
+      <line x1="670.5" y1="38" x2="670.5" y2="52" stroke="#b8cbc2"/>
+      <text x="670.5" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">24</text>
+    
+      <line x1="876" y1="38" x2="876" y2="52" stroke="#b8cbc2"/>
+      <text x="876" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">31</text>
+    
+    
+      <text x="22" y="88" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+0</text>
+      
+          <rect x="54" y="58" width="102.75" height="56" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="105.375" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="105.375" dy="0">Version</tspan><tspan x="105.375" dy="13">4 bit</tspan>
+  </text>
+          <text x="105.375" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="105.375" dy="0">4</tspan>
+  </text>
+        
+          <rect x="156.75" y="58" width="102.75" height="56" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="208.125" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="208.125" dy="0">IHL</tspan><tspan x="208.125" dy="13">4 bit</tspan>
+  </text>
+          <text x="208.125" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="208.125" dy="0">*4B</tspan>
+  </text>
+        
+          <rect x="259.5" y="58" width="205.5" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="362.25" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="362.25" dy="0">DSCP/ECN</tspan><tspan x="362.25" dy="13">8 bit</tspan>
+  </text>
+          <text x="362.25" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="362.25" dy="0">服务类型</tspan>
+  </text>
+        
+          <rect x="465" y="58" width="411" height="56" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="670.5" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="670.5" dy="0">Total Length</tspan><tspan x="670.5" dy="13">16 bit</tspan>
+  </text>
+          <text x="670.5" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="670.5" dy="0">首部+数据, B</tspan>
+  </text>
+        
+    
+      <text x="22" y="162" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+32</text>
+      
+          <rect x="54" y="132" width="411" height="56" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="259.5" y="147.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="259.5" dy="0">Identification</tspan><tspan x="259.5" dy="13">16 bit</tspan>
+  </text>
+          <text x="259.5" y="176" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="259.5" dy="0">同一原报文相同</tspan>
+  </text>
+        
+          <rect x="465" y="132" width="77.0625" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="503.53125" y="147.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="503.53125" dy="0">Flags</tspan><tspan x="503.53125" dy="13">3 bit</tspan>
+  </text>
+          <text x="503.53125" y="176" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="503.53125" dy="0">R/DF/MF</tspan>
+  </text>
+        
+          <rect x="542.0625" y="132" width="333.9375" height="56" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="709.03125" y="147.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="709.03125" dy="0">Fragment Offset</tspan><tspan x="709.03125" dy="13">13 bit</tspan>
+  </text>
+          <text x="709.03125" y="176" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="709.03125" dy="0">单位 8B</tspan>
+  </text>
+        
+    
+      <text x="22" y="236" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+64</text>
+      
+          <rect x="54" y="206" width="205.5" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="156.75" y="221.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="156.75" dy="0">TTL</tspan><tspan x="156.75" dy="13">8 bit</tspan>
+  </text>
+          <text x="156.75" y="250" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="156.75" dy="0">每跳 -1</tspan>
+  </text>
+        
+          <rect x="259.5" y="206" width="205.5" height="56" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="362.25" y="221.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="362.25" dy="0">Protocol</tspan><tspan x="362.25" dy="13">8 bit</tspan>
+  </text>
+          <text x="362.25" y="250" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="362.25" dy="0">TCP=6 UDP=17</tspan>
+  </text>
+        
+          <rect x="465" y="206" width="411" height="56" fill="#f3f0fb" stroke="#9fb8ad"/>
+          <text x="670.5" y="221.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="670.5" dy="0">Header Checksum</tspan><tspan x="670.5" dy="13">16 bit</tspan>
+  </text>
+          <text x="670.5" y="250" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="670.5" dy="0">只校验首部</tspan>
+  </text>
+        
+    
+      <text x="22" y="310" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+96</text>
+      
+          <rect x="54" y="280" width="822" height="56" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="465" y="295.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="465" dy="0">Source IPv4 Address</tspan><tspan x="465" dy="13">32 bit</tspan>
+  </text>
+          <text x="465" y="324" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="465" dy="0">源 IP, 4 字节</tspan>
+  </text>
+        
+    
+      <text x="22" y="384" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+128</text>
+      
+          <rect x="54" y="354" width="822" height="56" fill="#f3f0fb" stroke="#9fb8ad"/>
+          <text x="465" y="369.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="465" dy="0">Destination IPv4 Address</tspan><tspan x="465" dy="13">32 bit</tspan>
+  </text>
+          <text x="465" y="398" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="465" dy="0">目的 IP, 4 字节</tspan>
+  </text>
+        
+    
+      <text x="22" y="458" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+160</text>
+      
+          <rect x="54" y="428" width="822" height="56" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="465" y="443.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="465" dy="0">Options + Padding</tspan><tspan x="465" dy="13">32 bit</tspan>
+  </text>
+          <text x="465" y="472" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="465" dy="0">可选, IHL&gt;5 时出现</tspan>
+  </text>
+        
+    
+    
+    <text x="54" y="526" font-size="12" font-weight="750" fill="#5f6f66">IHL=5 表示没有选项，首部 20B；Total Length 不包含以太网头尾和填充。</text>
+  
+    <text x="54" y="544" font-size="12" font-weight="750" fill="#5f6f66">Protocol 字段决定交给 TCP、UDP 还是 ICMP；TTL 可用于推经过路由器数。</text>
+  
+  </svg>
+        <figcaption>IPv4 标准首部的每行都是 32 bit。做题时从 bit 长度定位字段，再把十六进制字节切开。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>作业二首部读取顺序</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>字段</th><th>bit 长度</th><th>单位/含义</th><th>作业值怎么读</th></tr></thead>
+          <tbody>
+            <tr><td>Version</td><td>4</td><td>IP 版本</td><td>0x45 的高 4bit = 4</td></tr><tr><td>IHL</td><td>4</td><td>单位 4B</td><td>0x45 的低 4bit = 5，所以首部 20B</td></tr><tr><td>Total Length</td><td>16</td><td>字节</td><td>0x0054 = 84B</td></tr><tr><td>TTL</td><td>8</td><td>跳数寿命</td><td>0x20 = 32</td></tr><tr><td>Protocol</td><td>8</td><td>上层协议</td><td>0x06 = TCP</td></tr><tr><td>Source/Destination</td><td>32+32</td><td>IPv4 地址</td><td>每 8bit 转成一个十进制数</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-4-2" class="detail-card" data-search="Flags + Fragment Offset：不要把 3 bit Flags 都叫 MF 考法：给 16bit 分片字段，要求读 DF/MF、片偏移；或给 MTU 算每片长度、MF、offset。 IPv4 分片控制字段由 Identification 16bit、Flags 3bit 和 Fragment Offset 13bit 组成；片偏移单位是 8B。 Flags 三位依次是 Reserved、DF、MF；MF 只是第三位，不是整个 3bit 字段。 DF=1 表示禁止分片；MF=1 表示后面还有分片；最后一片 MF=0。 Fragment Offset 13bit 表示本片数据在原始 IP 数据部分中的偏移，单位为 8B。 读 16bit 分片字段时，先取最高 3bit 为 Flags，再取低 13bit 为 offset。 分片计算先算原数据长度：原 IP 总长度 - 原 IP 首部长度。 每片最大数据 = floor((MTU - IP首部) / 8) * 8；除最后一片外都用 8B 整倍数。 每片总长度 = 该片 IP 首部 + 该片数据；offset = 该片数据起点 / 8。 offset 用 8B 为单位可以用 13bit 表示更大的偏移范围。 重组只在目的主机做，中间路由器无需保存所有分片状态，减少路由器复杂度。 0x5850 = 010 1100001010000，其中 Flags=010，所以 DF=1、MF=0；Offset=0x1850，实际字节偏移为 0x1850*8。">
+        <div class="detail-card-head">
+          <span>02</span>
+          <div>
+            <h2>Flags + Fragment Offset：不要把 3 bit Flags 都叫 MF</h2>
+            <p>考法：给 16bit 分片字段，要求读 DF/MF、片偏移；或给 MTU 算每片长度、MF、offset。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>IPv4 分片控制字段由 Identification 16bit、Flags 3bit 和 Fragment Offset 13bit 组成；片偏移单位是 8B。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>Flags 三位依次是 Reserved、DF、MF；MF 只是第三位，不是整个 3bit 字段。</li><li>DF=1 表示禁止分片；MF=1 表示后面还有分片；最后一片 MF=0。</li><li>Fragment Offset 13bit 表示本片数据在原始 IP 数据部分中的偏移，单位为 8B。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>读 16bit 分片字段时，先取最高 3bit 为 Flags，再取低 13bit 为 offset。</li><li>分片计算先算原数据长度：原 IP 总长度 - 原 IP 首部长度。</li><li>每片最大数据 = floor((MTU - IP首部) / 8) * 8；除最后一片外都用 8B 整倍数。</li><li>每片总长度 = 该片 IP 首部 + 该片数据；offset = 该片数据起点 / 8。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>offset 用 8B 为单位可以用 13bit 表示更大的偏移范围。</li><li>重组只在目的主机做，中间路由器无需保存所有分片状态，减少路由器复杂度。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>0x5850 = 010 1100001010000，其中 Flags=010，所以 DF=1、MF=0；Offset=0x1850，实际字节偏移为 0x1850*8。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 214" role="img" aria-label="IPv4 Flags + Fragment Offset 逐 bit 切分">
+    <rect x="1" y="1" width="898" height="212" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="54" y="22" font-size="13" font-weight="900" fill="#1f7a4d">IPv4 Flags + Fragment Offset 逐 bit 切分</text>
+    <text x="876" y="22" text-anchor="end" font-size="11" font-weight="800" fill="#5f6f66">每行 16 bit，数字为 bit 位置</text>
+    
+      <line x1="54" y1="38" x2="54" y2="52" stroke="#b8cbc2"/>
+      <text x="54" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">0</text>
+    
+      <line x1="105.375" y1="38" x2="105.375" y2="52" stroke="#b8cbc2"/>
+      <text x="105.375" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">1</text>
+    
+      <line x1="156.75" y1="38" x2="156.75" y2="52" stroke="#b8cbc2"/>
+      <text x="156.75" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">2</text>
+    
+      <line x1="208.125" y1="38" x2="208.125" y2="52" stroke="#b8cbc2"/>
+      <text x="208.125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">3</text>
+    
+      <line x1="876" y1="38" x2="876" y2="52" stroke="#b8cbc2"/>
+      <text x="876" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">15</text>
+    
+    
+      <text x="22" y="88" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+0</text>
+      
+          <rect x="54" y="58" width="51.375" height="56" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="79.6875" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="79.6875" dy="0">Reserved</tspan><tspan x="79.6875" dy="13">1 bit</tspan>
+  </text>
+          <text x="79.6875" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="79.6875" dy="0">0</tspan>
+  </text>
+        
+          <rect x="105.375" y="58" width="51.375" height="56" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="131.0625" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="131.0625" dy="0">DF</tspan><tspan x="131.0625" dy="13">1 bit</tspan>
+  </text>
+          <text x="131.0625" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="131.0625" dy="0">1=禁止分片</tspan>
+  </text>
+        
+          <rect x="156.75" y="58" width="51.375" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="182.4375" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="182.4375" dy="0">MF</tspan><tspan x="182.4375" dy="13">1 bit</tspan>
+  </text>
+          <text x="182.4375" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="182.4375" dy="0">1=后续还有片</tspan>
+  </text>
+        
+          <rect x="208.125" y="58" width="667.875" height="56" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="542.0625" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="542.0625" dy="0">Fragment Offset</tspan><tspan x="542.0625" dy="13">13 bit</tspan>
+  </text>
+          <text x="542.0625" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="542.0625" dy="0">单位 8B</tspan>
+  </text>
+        
+    
+    
+    <text x="54" y="156" font-size="12" font-weight="750" fill="#5f6f66">这个 16 bit 字段 = 3 bit Flags + 13 bit Offset；MF 只是 Flags 的最后 1 bit。</text>
+  
+    <text x="54" y="174" font-size="12" font-weight="750" fill="#5f6f66">例如 0x5850 = 010 1100001010000：DF=1、MF=0、Offset=0x1850。</text>
+  
+  </svg>
+        <figcaption>这张图专门服务作业二：16bit 分片字段必须先切成 3bit Flags + 13bit Offset。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>4000B 数据报经 MTU=1500 的标准分片例子</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>片号</th><th>数据起点</th><th>数据长度</th><th>IP总长度</th><th>Offset字段</th><th>MF</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>0</td><td>1480B</td><td>1500B</td><td>0</td><td>1</td></tr><tr><td>2</td><td>1480B</td><td>1480B</td><td>1500B</td><td>185</td><td>1</td></tr><tr><td>3</td><td>2960B</td><td>1020B</td><td>1040B</td><td>370</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-4-3" class="detail-card" data-search="最长前缀、子网与 CIDR：按 bit 比，不按十进制感觉猜 考法：给路由表和目的地址选下一跳；给地址块划分等长子网；写默认路由。 CIDR 用 a.b.c.d/x 表示前 x bit 是网络前缀；最长前缀匹配是在所有匹配路由中选择前缀长度最大的表项。 IP 地址属于接口，不属于整台路由器；路由器有多个接口时通常有多个 IP。 默认路由是 0.0.0.0/0，匹配所有地址但优先级最低。 等长子网划分借 k 位可得到 2^k 个子网，块大小由剩余主机位决定。 最长前缀题：把关键字节转二进制，只比较前缀覆盖的 bit。 子网题：先确定要几个子网，借几位；再写新前缀、块大小、网络号、广播地址。 新增主机路由用 /32；新增默认路由用 /0。 最长前缀让路由聚合和更具体例外路由可以同时存在。 CIDR 摆脱传统 A/B/C 类地址限制，提高地址分配和路由聚合效率。 作业二中 /28 与 /30 同时匹配时，/30 更具体；新增某个单独主机应写 131.128.55.33/32，而默认项应是 0.0.0.0/0。">
+        <div class="detail-card-head">
+          <span>03</span>
+          <div>
+            <h2>最长前缀、子网与 CIDR：按 bit 比，不按十进制感觉猜</h2>
+            <p>考法：给路由表和目的地址选下一跳；给地址块划分等长子网；写默认路由。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>CIDR 用 a.b.c.d/x 表示前 x bit 是网络前缀；最长前缀匹配是在所有匹配路由中选择前缀长度最大的表项。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>IP 地址属于接口，不属于整台路由器；路由器有多个接口时通常有多个 IP。</li><li>默认路由是 0.0.0.0/0，匹配所有地址但优先级最低。</li><li>等长子网划分借 k 位可得到 2^k 个子网，块大小由剩余主机位决定。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>最长前缀题：把关键字节转二进制，只比较前缀覆盖的 bit。</li><li>子网题：先确定要几个子网，借几位；再写新前缀、块大小、网络号、广播地址。</li><li>新增主机路由用 /32；新增默认路由用 /0。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>最长前缀让路由聚合和更具体例外路由可以同时存在。</li><li>CIDR 摆脱传统 A/B/C 类地址限制，提高地址分配和路由聚合效率。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业二中 /28 与 /30 同时匹配时，/30 更具体；新增某个单独主机应写 131.128.55.33/32，而默认项应是 0.0.0.0/0。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 270" role="img" aria-label="CIDR 地址切分">
+    <rect x="1" y="1" width="898" height="268" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="54" y="22" font-size="13" font-weight="900" fill="#1f7a4d">CIDR 地址切分</text>
+    <text x="876" y="22" text-anchor="end" font-size="11" font-weight="800" fill="#5f6f66">每行 32 bit，数字为 bit 位置</text>
+    
+      <line x1="54" y1="38" x2="54" y2="52" stroke="#b8cbc2"/>
+      <text x="54" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">0</text>
+    
+      <line x1="131.0625" y1="38" x2="131.0625" y2="52" stroke="#b8cbc2"/>
+      <text x="131.0625" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">3</text>
+    
+      <line x1="156.75" y1="38" x2="156.75" y2="52" stroke="#b8cbc2"/>
+      <text x="156.75" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">4</text>
+    
+      <line x1="233.8125" y1="38" x2="233.8125" y2="52" stroke="#b8cbc2"/>
+      <text x="233.8125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">7</text>
+    
+      <line x1="259.5" y1="38" x2="259.5" y2="52" stroke="#b8cbc2"/>
+      <text x="259.5" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">8</text>
+    
+      <line x1="439.3125" y1="38" x2="439.3125" y2="52" stroke="#b8cbc2"/>
+      <text x="439.3125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">15</text>
+    
+      <line x1="465" y1="38" x2="465" y2="52" stroke="#b8cbc2"/>
+      <text x="465" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">16</text>
+    
+      <line x1="644.8125" y1="38" x2="644.8125" y2="52" stroke="#b8cbc2"/>
+      <text x="644.8125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">23</text>
+    
+      <line x1="670.5" y1="38" x2="670.5" y2="52" stroke="#b8cbc2"/>
+      <text x="670.5" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">24</text>
+    
+      <line x1="876" y1="38" x2="876" y2="52" stroke="#b8cbc2"/>
+      <text x="876" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">31</text>
+    
+    
+      <text x="22" y="88" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+0</text>
+      
+          <rect x="54" y="58" width="411" height="56" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="259.5" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="259.5" dy="0">网络前缀</tspan><tspan x="259.5" dy="13">16 bit</tspan>
+  </text>
+          <text x="259.5" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="259.5" dy="0">例如 131.128</tspan>
+  </text>
+        
+          <rect x="465" y="58" width="308.25" height="56" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="619.125" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="619.125" dy="0">子网/更具体前缀</tspan><tspan x="619.125" dy="13">12 bit</tspan>
+  </text>
+          <text x="619.125" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="619.125" dy="0">/28 中继续匹配</tspan>
+  </text>
+        
+          <rect x="773.25" y="58" width="102.75" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="824.625" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="824.625" dy="0">主机位</tspan><tspan x="824.625" dy="13">4 bit</tspan>
+  </text>
+          <text x="824.625" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="824.625" dy="0">不参与 /28 匹配</tspan>
+  </text>
+        
+    
+      <text x="22" y="162" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+32</text>
+      
+          <rect x="54" y="132" width="411" height="56" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="259.5" y="147.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="259.5" dy="0">网络前缀</tspan><tspan x="259.5" dy="13">16 bit</tspan>
+  </text>
+          <text x="259.5" y="176" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="259.5" dy="0">相同</tspan>
+  </text>
+        
+          <rect x="465" y="132" width="359.625" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="644.8125" y="147.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="644.8125" dy="0">更具体前缀</tspan><tspan x="644.8125" dy="13">14 bit</tspan>
+  </text>
+          <text x="644.8125" y="176" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="644.8125" dy="0">/30 比 /28 多 2bit</tspan>
+  </text>
+        
+          <rect x="824.625" y="132" width="51.375" height="56" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="850.3125" y="147.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="850.3125" dy="0">主机位</tspan><tspan x="850.3125" dy="13">2 bit</tspan>
+  </text>
+          <text x="850.3125" y="176" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="850.3125" dy="0">剩余</tspan>
+  </text>
+        
+    
+    
+    <text x="54" y="230" font-size="12" font-weight="750" fill="#5f6f66">同一目的地址若同时匹配 /28 和 /30，选择 /30。</text>
+  
+  </svg>
+        <figcaption>最长前缀匹配本质是从左到右比 bit，前缀越长越具体。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-4-4" class="detail-card" data-search="ARP：同网段解析下一跳 MAC 考法：问 ARP 请求/应答谁广播谁单播；跨网段时 IP 和 MAC 哪些变。 ARP 在同一链路内把下一跳 IP 地址解析为 MAC 地址；它不负责解析远端网络主机的 MAC。 ARP Request 通常广播，ARP Reply 通常单播。 同一局域网内发给目标主机；跨网段时发给默认网关的 MAC。 端到端 IP 源/目的通常不变，但每一跳以太网源/目的 MAC 都会重写。 先判断目的 IP 是否同子网。 同子网：ARP 目的主机 IP；不同子网：ARP 默认网关接口 IP。 写每一跳帧时，IP 地址看端到端，MAC 地址看本链路下一跳。 IP 负责跨网络寻址，MAC 只在当前链路有效。 ARP 缓存带 TTL，避免每个分组都广播查询。 主机 H1 访问外网服务器时，IP 目的地址是服务器 IP，但第一跳以太网目的 MAC 是默认网关 MAC。">
+        <div class="detail-card-head">
+          <span>04</span>
+          <div>
+            <h2>ARP：同网段解析下一跳 MAC</h2>
+            <p>考法：问 ARP 请求/应答谁广播谁单播；跨网段时 IP 和 MAC 哪些变。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>ARP 在同一链路内把下一跳 IP 地址解析为 MAC 地址；它不负责解析远端网络主机的 MAC。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>ARP Request 通常广播，ARP Reply 通常单播。</li><li>同一局域网内发给目标主机；跨网段时发给默认网关的 MAC。</li><li>端到端 IP 源/目的通常不变，但每一跳以太网源/目的 MAC 都会重写。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>先判断目的 IP 是否同子网。</li><li>同子网：ARP 目的主机 IP；不同子网：ARP 默认网关接口 IP。</li><li>写每一跳帧时，IP 地址看端到端，MAC 地址看本链路下一跳。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>IP 负责跨网络寻址，MAC 只在当前链路有效。</li><li>ARP 缓存带 TTL，避免每个分组都广播查询。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>主机 H1 访问外网服务器时，IP 目的地址是服务器 IP，但第一跳以太网目的 MAC 是默认网关 MAC。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 314" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="312" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">H1</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="292" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="254" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="306" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="306" dy="0">本 LAN</tspan>
+  </text>
+    <line x1="306" y1="50" x2="306" y2="292" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="502" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="554" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="554" dy="0">默认网关</tspan>
+  </text>
+    <line x1="554" y1="50" x2="554" y2="292" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">外网服务器</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="292" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="306" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="182" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="182" dy="0">ARP Request 广播</tspan>
+  </text>
+      <text x="182" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="182" dy="0">谁有网关 IP?</tspan>
+  </text>
+    
+      <line x1="554" y1="130" x2="58" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="306" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="306" dy="0">ARP Reply 单播</tspan>
+  </text>
+      <text x="306" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="306" dy="0">网关 MAC</tspan>
+  </text>
+    
+      <line x1="58" y1="184" x2="554" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="306" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="306" dy="0">IP包封装进帧</tspan>
+  </text>
+      <text x="306" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="306" dy="0">Dst MAC=网关</tspan>
+  </text>
+    
+      <line x1="554" y1="238" x2="802" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="678" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="678" dy="0">路由转发</tspan>
+  </text>
+      <text x="678" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="678" dy="0">换下一跳 MAC</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>跨网段通信时，ARP 解析的是“下一跳”，不是最终服务器。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-4-5" class="detail-card" data-search="DHCP：DORA 状态过程 考法：DHCP 基于 UDP，四步 Discover/Offer/Request/ACK，返回 IP/掩码/网关/DNS。 DHCP 让新接入主机自动获取 IP 地址、子网掩码、默认网关、DNS 服务器和租期等参数。 客户端初始没有 IP，所以 Discover 常用广播。 DHCP 运行在 UDP 上，服务器端口 67，客户端端口 68。 四步 DORA 中，Request 既可确认选择某个 Offer，也可在续租时请求继续使用地址。 记顺序：Discover 找服务器，Offer 给方案，Request 选方案，ACK 确认租约。 若题目问“能不能跨网段”，补充 DHCP relay 可转发请求。 若问返回内容，不只写 IP，还要写掩码、网关、DNS、租期。 广播解决客户端初始无地址的问题。 租期机制允许地址回收和移动主机重新配置。 期末填空问 DHCP 基于什么传输层协议：UDP；问四个报文：Discover、Offer、Request、ACK。">
+        <div class="detail-card-head">
+          <span>05</span>
+          <div>
+            <h2>DHCP：DORA 状态过程</h2>
+            <p>考法：DHCP 基于 UDP，四步 Discover/Offer/Request/ACK，返回 IP/掩码/网关/DNS。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>DHCP 让新接入主机自动获取 IP 地址、子网掩码、默认网关、DNS 服务器和租期等参数。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>客户端初始没有 IP，所以 Discover 常用广播。</li><li>DHCP 运行在 UDP 上，服务器端口 67，客户端端口 68。</li><li>四步 DORA 中，Request 既可确认选择某个 Offer，也可在续租时请求继续使用地址。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>记顺序：Discover 找服务器，Offer 给方案，Request 选方案，ACK 确认租约。</li><li>若题目问“能不能跨网段”，补充 DHCP relay 可转发请求。</li><li>若问返回内容，不只写 IP，还要写掩码、网关、DNS、租期。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>广播解决客户端初始无地址的问题。</li><li>租期机制允许地址回收和移动主机重新配置。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>期末填空问 DHCP 基于什么传输层协议：UDP；问四个报文：Discover、Offer、Request、ACK。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 314" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="312" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">DHCP 客户端</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="292" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">DHCP 服务器</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="292" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="802" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Discover</tspan>
+  </text>
+      <text x="430" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">INIT: 广播寻找</tspan>
+  </text>
+    
+      <line x1="802" y1="130" x2="58" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Offer</tspan>
+  </text>
+      <text x="430" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">提供 IP 参数</tspan>
+  </text>
+    
+      <line x1="58" y1="184" x2="802" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Request</tspan>
+  </text>
+      <text x="430" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">REQUESTING: 选择租约</tspan>
+  </text>
+    
+      <line x1="802" y1="238" x2="58" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">ACK</tspan>
+  </text>
+      <text x="430" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">BOUND: 地址可用</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>DORA 既是报文顺序，也是客户端从 INIT 到 BOUND 的状态转移。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-4-6" class="detail-card" data-search="NAT：出站改源，回包改目的 考法：给内网主机、公网 NAT 地址和服务器，要求写转发前后源/目的 IP/端口。 NAT 通过地址和端口转换，让多个私有地址主机共享公网地址访问外网，并用转换表匹配返回报文。 出站：源 IP/源端口从内网地址改成 NAT 公网地址/新端口，目的 IP/端口通常不变。 入站回包：目的 IP/目的端口从 NAT 公网地址/端口改回内网主机地址/端口。 NAT 表通常记录 WAN 侧二元组与 LAN 侧二元组的映射。 先画出方向：内网 -&gt; 外网 是出站，外网 -&gt; 内网 是回包。 出站只改源；回包只改目的；除非题目有特殊代理设定。 把端口也写上，否则多个内网主机同时访问同一服务器无法区分。 私有 IPv4 地址不能在公网路由，NAT 用公网地址代表内网主机。 端口复用让一个公网 IP 可以同时承载大量内部连接。 作业二 NAT 题中 H1 出站前源 IP 是 172.18.1.33，经过 R2 后源 IP 变成 203.10.2.3，目的 IP 仍是 213.48.226.31。">
+        <div class="detail-card-head">
+          <span>06</span>
+          <div>
+            <h2>NAT：出站改源，回包改目的</h2>
+            <p>考法：给内网主机、公网 NAT 地址和服务器，要求写转发前后源/目的 IP/端口。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>NAT 通过地址和端口转换，让多个私有地址主机共享公网地址访问外网，并用转换表匹配返回报文。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>出站：源 IP/源端口从内网地址改成 NAT 公网地址/新端口，目的 IP/端口通常不变。</li><li>入站回包：目的 IP/目的端口从 NAT 公网地址/端口改回内网主机地址/端口。</li><li>NAT 表通常记录 WAN 侧二元组与 LAN 侧二元组的映射。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>先画出方向：内网 -&gt; 外网 是出站，外网 -&gt; 内网 是回包。</li><li>出站只改源；回包只改目的；除非题目有特殊代理设定。</li><li>把端口也写上，否则多个内网主机同时访问同一服务器无法区分。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>私有 IPv4 地址不能在公网路由，NAT 用公网地址代表内网主机。</li><li>端口复用让一个公网 IP 可以同时承载大量内部连接。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业二 NAT 题中 H1 出站前源 IP 是 172.18.1.33，经过 R2 后源 IP 变成 203.10.2.3，目的 IP 仍是 213.48.226.31。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 320" role="img" aria-label="NAT 地址端口转换图">
+    <defs>
+      <marker id="natArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="898" height="318" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="34" y="32" font-size="14" font-weight="900" fill="#1f7a4d">NAT 转换：出站改源，回包改目的</text>
+    <rect x="48" y="72" width="172" height="64" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="134" y="97" text-anchor="middle" font-size="12" font-weight="900">内网主机</text>
+    <text x="134" y="118" text-anchor="middle" font-size="12" font-weight="750">10.0.0.1:3345</text>
+    <rect x="360" y="68" width="180" height="78" rx="8" fill="#fff6e8" stroke="#e7c9a3"/>
+    <text x="450" y="93" text-anchor="middle" font-size="12" font-weight="900">NAT 路由器</text>
+    <text x="450" y="114" text-anchor="middle" font-size="12" font-weight="750">公网 138.76.29.7</text>
+    <text x="450" y="134" text-anchor="middle" font-size="11" font-weight="750">表: 5001 -> 10.0.0.1:3345</text>
+    <rect x="680" y="72" width="172" height="64" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="766" y="97" text-anchor="middle" font-size="12" font-weight="900">公网服务器</text>
+    <text x="766" y="118" text-anchor="middle" font-size="12" font-weight="750">128.119.40.186:80</text>
+    <line x1="220" y1="105" x2="358" y2="105" stroke="#146c73" stroke-width="2.4" marker-end="url(#natArrow)"/>
+    <text x="290" y="88" text-anchor="middle" font-size="11" font-weight="850">源 10.0.0.1:3345</text>
+    <line x1="540" y1="105" x2="678" y2="105" stroke="#146c73" stroke-width="2.4" marker-end="url(#natArrow)"/>
+    <text x="610" y="88" text-anchor="middle" font-size="11" font-weight="850">源 138.76.29.7:5001</text>
+    <line x1="680" y1="202" x2="542" y2="202" stroke="#146c73" stroke-width="2.4" marker-end="url(#natArrow)"/>
+    <text x="610" y="185" text-anchor="middle" font-size="11" font-weight="850">目的 138.76.29.7:5001</text>
+    <line x1="360" y1="202" x2="222" y2="202" stroke="#146c73" stroke-width="2.4" marker-end="url(#natArrow)"/>
+    <text x="290" y="185" text-anchor="middle" font-size="11" font-weight="850">目的 10.0.0.1:3345</text>
+    <rect x="84" y="244" width="732" height="42" rx="8" fill="#f7fbf8" stroke="#d8e2dc"/>
+    <text x="450" y="270" text-anchor="middle" font-size="12" font-weight="850" fill="#5f6f66">作业写法：转发前源/目的 IP；转发后源/目的 IP。若题目给端口，也必须写端口映射。</text>
+  </svg>
+        <figcaption>NAT 表是整道题核心；没有表，回包无法知道该回到哪台内网主机。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-4-7" class="detail-card" data-search="RIP、OSPF、BGP：算法、范围和更新状态 考法：判断协议类型、度量、AS 内/AS 间、RIP 距离 16、OSPF 泛洪、BGP 路径向量。 RIP 是 AS 内距离向量协议，OSPF 是 AS 内链路状态协议，BGP 是 AS 间路径向量协议。 RIP 与邻居交换距离向量，度量是跳数，16 表示不可达。 OSPF 泛洪链路状态通告，每个路由器拿到拓扑图后用 Dijkstra 算最短路径。 BGP 基于 TCP 会话通告可达前缀和 AS-PATH 等属性，策略比纯最短路径更重要。 RIP 表更新：收到邻居通告后先给距离 +1，再与现有表项比较。 OSPF 题写清 LS Advertisement 泛洪，不是只发给一个邻居。 BGP 题写 AS 间、TCP、路径向量、策略。 RIP 简单但收敛慢，适合小网络。 OSPF 掌握全局拓扑，收敛快但状态更多。 BGP 要表达商业关系和策略，不能只按跳数选路。 作业二 RIP 表中收到邻居路由后，每条候选距离先加 1；若距离更短或下一跳相同需要更新。">
+        <div class="detail-card-head">
+          <span>07</span>
+          <div>
+            <h2>RIP、OSPF、BGP：算法、范围和更新状态</h2>
+            <p>考法：判断协议类型、度量、AS 内/AS 间、RIP 距离 16、OSPF 泛洪、BGP 路径向量。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>RIP 是 AS 内距离向量协议，OSPF 是 AS 内链路状态协议，BGP 是 AS 间路径向量协议。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>RIP 与邻居交换距离向量，度量是跳数，16 表示不可达。</li><li>OSPF 泛洪链路状态通告，每个路由器拿到拓扑图后用 Dijkstra 算最短路径。</li><li>BGP 基于 TCP 会话通告可达前缀和 AS-PATH 等属性，策略比纯最短路径更重要。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>RIP 表更新：收到邻居通告后先给距离 +1，再与现有表项比较。</li><li>OSPF 题写清 LS Advertisement 泛洪，不是只发给一个邻居。</li><li>BGP 题写 AS 间、TCP、路径向量、策略。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>RIP 简单但收敛慢，适合小网络。</li><li>OSPF 掌握全局拓扑，收敛快但状态更多。</li><li>BGP 要表达商业关系和策略，不能只按跳数选路。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业二 RIP 表中收到邻居路由后，每条候选距离先加 1；若距离更短或下一跳相同需要更新。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 260" role="img" aria-label="RIP OSPF BGP 对比图">
+    <rect x="1" y="1" width="898" height="258" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="34" y="32" font-size="14" font-weight="900" fill="#1f7a4d">路由协议状态信息对比</text>
+    <g>
+      <rect x="54" y="64" width="240" height="142" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <text x="174" y="92" text-anchor="middle" font-size="15" font-weight="900">RIP</text>
+      <text x="174" y="120" text-anchor="middle" font-size="12" font-weight="800">距离向量</text>
+      <text x="174" y="146" text-anchor="middle" font-size="12" font-weight="750">和邻居交换距离表</text>
+      <text x="174" y="172" text-anchor="middle" font-size="12" font-weight="750">度量: 跳数, 16 不可达</text>
+    </g>
+    <g>
+      <rect x="330" y="64" width="240" height="142" rx="8" fill="#fff6e8" stroke="#e7c9a3"/>
+      <text x="450" y="92" text-anchor="middle" font-size="15" font-weight="900">OSPF</text>
+      <text x="450" y="120" text-anchor="middle" font-size="12" font-weight="800">链路状态</text>
+      <text x="450" y="146" text-anchor="middle" font-size="12" font-weight="750">泛洪 LSA, 得到拓扑图</text>
+      <text x="450" y="172" text-anchor="middle" font-size="12" font-weight="750">本地运行 Dijkstra</text>
+    </g>
+    <g>
+      <rect x="606" y="64" width="240" height="142" rx="8" fill="#ecf4f6" stroke="#b8cbc2"/>
+      <text x="726" y="92" text-anchor="middle" font-size="15" font-weight="900">BGP</text>
+      <text x="726" y="120" text-anchor="middle" font-size="12" font-weight="800">路径向量</text>
+      <text x="726" y="146" text-anchor="middle" font-size="12" font-weight="750">AS 间, TCP 会话</text>
+      <text x="726" y="172" text-anchor="middle" font-size="12" font-weight="750">看 AS-PATH 与策略</text>
+    </g>
+    <text x="54" y="232" font-size="12" font-weight="750" fill="#5f6f66">答题抓手：RIP 小网络/跳数；OSPF AS 内/全局拓扑；BGP AS 间/策略。</text>
+  </svg>
+        <figcaption>三种协议的“状态信息”不同：RIP 存距离，OSPF 存链路状态库，BGP 存路径属性。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-4-8" class="detail-card" data-search="IPv6、隧道与分片：作业二最后一题 考法：IPv6 地址展开、IPv6-in-IPv4 隧道外层首部、经 IPv4 链路分片计算。 IPv6 使用 128bit 地址和固定 40B 基本首部；隧道把 IPv6 分组作为 IPv4 数据报的数据部分穿越 IPv4 网络。 IPv6 地址中 :: 只能使用一次，用来压缩连续的 0 组。 IPv6 基本首部固定 40B，没有 IPv4 首部校验和。 IPv6-in-IPv4 隧道中，外层首部是 IPv4 首部；若外层 IPv4 数据报超过链路 MTU，按 IPv4 分片规则切。 展开地址：每组补足 4 个十六进制数字，:: 补够缺失的 0000 组。 隧道总长度：外层 IPv4 首部 + 内层 IPv6 分组长度。 分片时把外层 IPv4 数据部分视为要切的数据，offset 仍以 8B 为单位。 隧道让 IPv6 可以逐步部署，不需要所有中间网络同时升级。 IPv6 路由器不分片，目的是让路由器处理更快，把路径 MTU 处理交给端系统。 作业二中内层 IPv6 总长度为 5000+40=5040B，外层 IPv4 总长度为 5040+20=5060B；若 MTU=720，则每片外层数据最大 floor((720-20)/8)*8=696B。">
+        <div class="detail-card-head">
+          <span>08</span>
+          <div>
+            <h2>IPv6、隧道与分片：作业二最后一题</h2>
+            <p>考法：IPv6 地址展开、IPv6-in-IPv4 隧道外层首部、经 IPv4 链路分片计算。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>IPv6 使用 128bit 地址和固定 40B 基本首部；隧道把 IPv6 分组作为 IPv4 数据报的数据部分穿越 IPv4 网络。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>IPv6 地址中 :: 只能使用一次，用来压缩连续的 0 组。</li><li>IPv6 基本首部固定 40B，没有 IPv4 首部校验和。</li><li>IPv6-in-IPv4 隧道中，外层首部是 IPv4 首部；若外层 IPv4 数据报超过链路 MTU，按 IPv4 分片规则切。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>展开地址：每组补足 4 个十六进制数字，:: 补够缺失的 0000 组。</li><li>隧道总长度：外层 IPv4 首部 + 内层 IPv6 分组长度。</li><li>分片时把外层 IPv4 数据部分视为要切的数据，offset 仍以 8B 为单位。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>隧道让 IPv6 可以逐步部署，不需要所有中间网络同时升级。</li><li>IPv6 路由器不分片，目的是让路由器处理更快，把路径 MTU 处理交给端系统。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业二中内层 IPv6 总长度为 5000+40=5040B，外层 IPv4 总长度为 5040+20=5060B；若 MTU=720，则每片外层数据最大 floor((720-20)/8)*8=696B。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 260" role="img" aria-label="IPv6 in IPv4 隧道封装图">
+    <rect x="1" y="1" width="898" height="258" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="34" y="32" font-size="14" font-weight="900" fill="#1f7a4d">IPv6-in-IPv4 隧道：外层 IPv4 + 内层 IPv6</text>
+    <rect x="64" y="76" width="140" height="70" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="134" y="105" text-anchor="middle" font-size="12" font-weight="900">外层 IPv4 首部</text>
+    <text x="134" y="126" text-anchor="middle" font-size="12" font-weight="750">20B, 可被分片</text>
+    <rect x="204" y="76" width="190" height="70" rx="0" fill="#fff6e8" stroke="#e7c9a3"/>
+    <text x="299" y="105" text-anchor="middle" font-size="12" font-weight="900">内层 IPv6 首部</text>
+    <text x="299" y="126" text-anchor="middle" font-size="12" font-weight="750">40B</text>
+    <rect x="394" y="76" width="420" height="70" rx="8" fill="#f7fbf8" stroke="#b8cbc2"/>
+    <text x="604" y="105" text-anchor="middle" font-size="12" font-weight="900">IPv6 Payload</text>
+    <text x="604" y="126" text-anchor="middle" font-size="12" font-weight="750">例如 5000B 数据</text>
+    <line x1="64" y1="178" x2="814" y2="178" stroke="#146c73" stroke-width="3"/>
+    <text x="439" y="202" text-anchor="middle" font-size="12" font-weight="850" fill="#5f6f66">外层 IPv4 Total Length = 20B + 整个内层 IPv6 分组</text>
+    <text x="439" y="226" text-anchor="middle" font-size="12" font-weight="850" fill="#5f6f66">若经 IPv4 MTU 较小链路分片，offset/MF 都按外层 IPv4 分片规则计算。</text>
+  </svg>
+        <figcaption>隧道题要分清：外层 IPv4 首部用于穿过 IPv4 网络，内层 IPv6 分组是 IPv4 的数据。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      </div>
+    </section>
+  </main>
+
+  <script>
+const key = document.body.dataset.storage || "network-review";
+const state = JSON.parse(localStorage.getItem(key) || "{}");
+const checks = [...document.querySelectorAll("[data-check]")];
+const notes = document.getElementById("notes");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+let onlyUnmastered = false;
+
+function save() {
+  const mastered = checks.map((input) => input.checked);
+  localStorage.setItem(key, JSON.stringify({ mastered, notes: notes?.value || "" }));
+}
+
+function updateProgress() {
+  const done = checks.filter((input) => input.checked).length;
+  const total = checks.length || 1;
+  const percent = Math.round((done / total) * 100);
+  if (progressText) progressText.textContent = percent + "%";
+  if (progressBar) progressBar.style.width = percent + "%";
+  checks.forEach((input) => {
+    const row = input.closest(".check-row");
+    row?.classList.toggle("mastered", input.checked);
+    if (onlyUnmastered) row.hidden = input.checked;
+  });
+}
+
+checks.forEach((input, index) => {
+  input.checked = Boolean(state.mastered?.[index]);
+  input.addEventListener("change", () => {
+    save();
+    updateProgress();
+  });
+});
+if (notes) {
+  notes.value = state.notes || "";
+  notes.addEventListener("input", save);
+}
+updateProgress();
+
+document.querySelectorAll(".topic-head").forEach((button) => {
+  button.addEventListener("click", () => {
+    const body = button.parentElement.querySelector(".topic-body");
+    const isOpen = body.classList.toggle("open");
+    button.setAttribute("aria-expanded", String(isOpen));
+  });
+});
+
+document.querySelectorAll(".qa-question").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.parentElement.querySelector(".qa-answer")?.classList.toggle("open");
+  });
+});
+
+document.getElementById("expandAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.add("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "true"));
+});
+
+document.getElementById("collapseAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.remove("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "false"));
+});
+
+document.getElementById("toggleUnmastered")?.addEventListener("click", (event) => {
+  onlyUnmastered = !onlyUnmastered;
+  event.currentTarget.classList.toggle("active", onlyUnmastered);
+  updateProgress();
+});
+
+document.getElementById("searchInput")?.addEventListener("input", (event) => {
+  const q = event.target.value.trim().toLowerCase();
+  document.querySelectorAll("[data-search]").forEach((node) => {
+    node.hidden = q && !node.dataset.search.toLowerCase().includes(q);
+  });
+});
+
+document.getElementById("copySummary")?.addEventListener("click", async () => {
+  const pending = checks
+    .filter((input) => !input.checked)
+    .map((input) => "- " + input.closest(".check-row").innerText.trim())
+    .join("\n");
+  const text = [
+    document.querySelector("h1")?.innerText || "计算机网络复习",
+    "",
+    "未掌握清单:",
+    pending || "- 已全部勾选",
+    "",
+    "我的补充:",
+    notes?.value || ""
+  ].join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+  } catch {
+    document.getElementById("copyStatus").textContent = "浏览器限制复制，请手动选择文本。";
+  }
+});
+
+function formatSeconds(value) {
+  if (!Number.isFinite(value)) return "无法计算";
+  if (value >= 3600) return (value / 3600).toFixed(2) + " h";
+  if (value >= 60) return (value / 60).toFixed(2) + " min";
+  return value.toFixed(2) + " s";
+}
+
+function updateP2P() {
+  const box = document.querySelector('[data-tool="p2p"]');
+  if (!box) return;
+  const read = (name) => Number(box.querySelector('[data-p2p="' + name + '"]')?.value || 0);
+  const Fbits = read("F") * 1e9;
+  const N = read("N");
+  const us = read("us") * 1e6;
+  const dmin = read("dmin") * 1e6;
+  const u = read("u") * 1e6;
+  const sumPeer = N * u;
+  const dcs = Math.max((N * Fbits) / us, Fbits / dmin);
+  const dp2p = Math.max(Fbits / us, Fbits / dmin, (N * Fbits) / (us + sumPeer));
+  const serverTerm = (N * Fbits) / us;
+  const result = box.querySelector("#p2pResult");
+  if (result) {
+    result.innerHTML = [
+      "Dcs = max(NF/us, F/dmin) = " + formatSeconds(dcs),
+      "Dp2p = max(F/us, F/dmin, NF/(us+N*u)) = " + formatSeconds(dp2p),
+      "C/S 服务器上传项 NF/us = " + formatSeconds(serverTerm)
+    ].join("<br>");
+  }
+}
+
+document.querySelectorAll("[data-p2p]").forEach((input) => {
+  input.addEventListener("input", updateP2P);
+});
+updateP2P();
+</script>
+</body>
+</html>

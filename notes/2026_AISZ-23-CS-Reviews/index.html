@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>计算机网络复习总览</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+  <header class="topbar index-hero">
+    <div class="title-block">
+      <p class="eyebrow">Computer Networks Review</p>
+      <h1>计算机网络复习总览</h1>
+      <p>以三次作业为主线，串起第1-7章知识点和期末回忆版题型。</p>
+    </div>
+    <div class="progress-panel">
+      <strong>7 + 4</strong>
+      <span>总结页 + 详细页</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索总览</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 分片、DNS、Reno">
+      </label>
+    </section>
+
+    <section class="index-grid">
+      
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 1</p>
+        <h2>第1章 计算机网络概述</h2>
+        <p>先建立全局框架：网络边缘/核心/接入、交换方式、时延吞吐、五层模型。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter1-summary.html">总结页</a>
+        
+        <a href="chapter1-interactive.html">原交互页</a>
+      </div>
+    </article>
+  
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 2</p>
+        <h2>第2章 物理层</h2>
+        <p>重点掌握码元/比特、Nyquist/Shannon、编码调制、多路复用和物理设备边界。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter2-summary.html">总结页</a>
+        
+        <a href="chapter2-interactive.html">原交互页</a>
+      </div>
+    </article>
+  
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 3</p>
+        <h2>第3章 数据链路层与局域网</h2>
+        <p>重点是成帧、差错检测、可靠传输窗口、以太网、交换机、VLAN 和 CSMA/CD。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter3-summary.html">总结页</a>
+        <a href="chapter3-detail.html">详细介绍</a>
+        <a href="chapter3-interactive.html">原交互页</a>
+      </div>
+    </article>
+  
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 4</p>
+        <h2>第4章 网络层</h2>
+        <p>这是作业与期末核心章: IPv4 首部、分片、子网/CIDR、最长前缀、ARP/DHCP/NAT、RIP/OSPF/BGP。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter4-summary.html">总结页</a>
+        <a href="chapter4-detail.html">详细介绍</a>
+        
+      </div>
+    </article>
+  
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 5</p>
+        <h2>第5章 传输层</h2>
+        <p>第三次作业与期末都压 TCP: 端口复用、TCP 首部、可靠传输、三次握手、流控、拥塞控制和 Reno 计算。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter5-summary.html">总结页</a>
+        <a href="chapter5-detail.html">详细介绍</a>
+        
+      </div>
+    </article>
+  
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 6</p>
+        <h2>第6章 应用层</h2>
+        <p>作业三重点: DNS 查询和资源记录、C/S 与 P2P 分发、HTTP/TCP、SMTP/MIME。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter6-summary.html">总结页</a>
+        <a href="chapter6-detail.html">详细介绍</a>
+        
+      </div>
+    </article>
+  
+    <article class="index-card">
+      <div>
+        <p class="eyebrow">Chapter 7</p>
+        <h2>第7章 无线与移动网络</h2>
+        <p>期末可能考概念和过程: 无线链路特性、802.11 体系结构、CSMA/CA、RTS/CTS、地址字段、移动管理。</p>
+      </div>
+      <div class="card-actions">
+        <a href="chapter7-summary.html">总结页</a>
+        
+        
+      </div>
+    </article>
+  
+    </section>
+
+    <section class="homework-section">
+      <div class="section-title">
+        <p class="eyebrow">Homework First</p>
+        <h2>作业与期末考点地图</h2>
+      </div>
+      <div class="homework-grid">
+        
+    <article class="homework-card">
+      <div class="homework-head">
+        <h2>作业一</h2>
+        <span>基础公式与体系结构</span>
+      </div>
+      <ul><li>五层体系结构与 PDU: 比特、帧、数据报、段、报文。</li><li>波特率与比特率: Rb = RB log2 M。</li><li>存储转发时延: 传输、传播、处理时延的叠加。</li><li>报文交换 vs 分组交换: 分组可流水线，常更快。</li><li>滑动窗口吞吐量: U = Ws * tf / (tf + RTT)，满利用时求窗口。</li></ul>
+      <p class="chapter-tags">关联章节: 第1章 / 第2章 / 第3章</p>
+    </article>
+  
+    <article class="homework-card">
+      <div class="homework-head">
+        <h2>作业二</h2>
+        <span>网络层核心</span>
+      </div>
+      <ul><li>IPv4 首部字段: IHL、Total Length、ID、Flag/Offset、TTL、Protocol、Checksum、源/目的 IP。</li><li>最长前缀匹配: 多个匹配时选前缀最长项，主机路由 /32 比默认路由 /0 更具体。</li><li>子网划分: 借位、掩码、网络号、广播地址、可用地址范围。</li><li>NAT: 出站改源 IP/端口，回包按 NAT 表改目的 IP/端口。</li><li>RIP: 距离向量、下一跳、跳数、不可达距离 16。</li><li>IPv6: 完整写法、隧道外层 IPv4 首部、分片计算。</li></ul>
+      <p class="chapter-tags">关联章节: 第4章</p>
+    </article>
+  
+    <article class="homework-card">
+      <div class="homework-head">
+        <h2>作业三</h2>
+        <span>TCP 与应用层</span>
+      </div>
+      <ul><li>TCP Reno: BDP 求最大窗口，平均窗口 0.75W，平均吞吐量，恢复时间。</li><li>C/S 与 P2P 分发: Dcs 与 Dp2p 公式，对比随 N 增长的扩展性。</li><li>IP/TCP 报文分析: 源/目的 IP、三次握手、以太网填充、应用数据长度、TTL 推路由器数。</li><li>DNS: 递归+迭代查询过程，A/NS/MX 记录添加，缓存带来的延迟降低。</li><li>SMTP/MIME: 三阶段，TCP/25，MIME 让二进制附件经 Base64 等编码传输。</li></ul>
+      <p class="chapter-tags">关联章节: 第5章 / 第6章</p>
+    </article>
+  
+    <article class="homework-card">
+      <div class="homework-head">
+        <h2>期末回忆版</h2>
+        <span>题型补强</span>
+      </div>
+      <ul><li>填空覆盖概念与公式: 时延、Nyquist、汉明距离、DHCP/UDP、IPv4 32 bit、BGP、Cookie。</li><li>选择覆盖判断: 交换方式、Shannon、编码、CSMA/CA ACK、最长前缀、NAT、分片、RIP、TCP 标志位。</li><li>分析题重计算: CSMA/CD、子网、OSPF/分片、ARP/NAT、DNS/SMTP/TCP 拥塞。</li></ul>
+      <p class="chapter-tags">关联章节: 第1章 / 第2章 / 第3章 / 第4章 / 第5章 / 第6章 / 第7章</p>
+    </article>
+  
+      </div>
+    </section>
+  </main>
+  <script>
+    const input = document.getElementById("searchInput");
+    input?.addEventListener("input", () => {
+      const q = input.value.trim().toLowerCase();
+      document.querySelectorAll(".index-card,.homework-card").forEach((card) => {
+        card.hidden = q && !card.textContent.toLowerCase().includes(q);
+      });
+    });
+  </script>
+</body>
+</html>
