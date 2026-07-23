@@ -18,6 +18,10 @@
 - 李全龙
   <!-- TOML-ITEM: id="review-李全龙-1" -->
   - 本部来的老师，哈工大计网 MOOC 的领头人。
+   <!-- TOML-ITEM: id="review-王京华-1" -->
+- 王京华
+  <!-- TOML-ITEM: id="review-王京华-1" -->
+  - 26年23AISZ班授课老师，人特别好不会紧抓考勤。
 
 ## 在线资源
 <!-- TOML-SECTION: title="在线资源" -->
