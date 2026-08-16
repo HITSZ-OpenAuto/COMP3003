@@ -1,0 +1,1549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第3章详细介绍：数据链路层与局域网 - 计算机网络复习</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body data-storage="network-review-detail-ch3">
+  <header class="topbar">
+    <a class="back-link" href="chapter3-summary.html">返回第3章总结</a>
+    <div class="title-block">
+      <p class="eyebrow">Chapter 3 Detail</p>
+      <h1>第3章详细介绍：数据链路层与局域网</h1>
+      <p>把链路层题目拆成三类：字段长度题、差错/窗口计算题、协议状态过程题。</p>
+    </div>
+    <div class="progress-panel">
+      <strong>6</strong>
+      <span>详细考点</span>
+    </div>
+  </header>
+
+  <main>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="" href="chapter1-summary.html">第1章</a><a class="" href="chapter2-summary.html">第2章</a><a class="active" href="chapter3-summary.html">第3章</a><a class="" href="chapter4-summary.html">第4章</a><a class="" href="chapter5-summary.html">第5章</a><a class="" href="chapter6-summary.html">第6章</a><a class="" href="chapter7-summary.html">第7章</a>
+    </nav>
+
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索详细页</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 IPv4 bit、MF、三次握手、MX">
+      </label>
+      <a class="tool-link" href="chapter3-summary.html">回到总结页</a>
+    </section>
+
+    <section class="detail-layout">
+      <aside class="detail-toc">
+        <h2>本页目录</h2>
+        
+    <a href="#detail-3-1">01 成帧与透明传输：接收方如何不看错边界</a>
+  
+    <a href="#detail-3-2">02 CRC 与汉明距离：检测题先写能力边界</a>
+  
+    <a href="#detail-3-3">03 以太网帧与 802.1Q：最小帧长、填充和 VLAN ID</a>
+  
+    <a href="#detail-3-4">04 CSMA/CD：状态过程和最小帧长为什么绑定</a>
+  
+    <a href="#detail-3-5">05 可靠传输：停等、GBN、SR 的发送方/接收方状态</a>
+  
+    <a href="#detail-3-6">06 交换机、VLAN、PPP：按动作顺序答题</a>
+  
+      </aside>
+      <div class="detail-main">
+        
+      <article id="detail-3-1" class="detail-card" data-search="成帧与透明传输：接收方如何不看错边界 考法：给出字节串或比特串，让你判断填充/解填充后原始数据是什么。 成帧是链路层给网络层数据加上边界、地址和差错检测信息，使接收方能识别一帧从哪里开始、到哪里结束。 透明传输的关键不是“看起来透明”，而是数据字段中出现定界符时，接收方仍能把它当普通数据。 字节填充：若数据中出现 FLAG 或 ESC，就在它前面插入 ESC；接收端看到 ESC 后，把下一个字节按数据解释。 比特填充：发送端每遇到连续 5 个 1，就插入 1 个 0；接收端看到连续 5 个 1 后，如果下一个 bit 是 0 就删除。 先找定界符：PPP/HDLC 常用 01111110。 再按方向判断：发送方向题目要插入填充位，接收方向题目要删除填充位。 最后验证：真正帧边界只在首尾出现，数据区不应再裸露定界符模式。 链路层不能限制上层数据内容，所以必须让任何数据模式都能安全通过。 比特填充比直接删除定界符更稳，因为它只改变发送表示，接收端可逆恢复原始数据。 若数据中出现 01111110，发送端不会让它原样进入帧数据区，而是在连续 5 个 1 后插入 0，使接收方不会误判为帧结束。">
+        <div class="detail-card-head">
+          <span>01</span>
+          <div>
+            <h2>成帧与透明传输：接收方如何不看错边界</h2>
+            <p>考法：给出字节串或比特串，让你判断填充/解填充后原始数据是什么。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>成帧是链路层给网络层数据加上边界、地址和差错检测信息，使接收方能识别一帧从哪里开始、到哪里结束。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>透明传输的关键不是“看起来透明”，而是数据字段中出现定界符时，接收方仍能把它当普通数据。</li><li>字节填充：若数据中出现 FLAG 或 ESC，就在它前面插入 ESC；接收端看到 ESC 后，把下一个字节按数据解释。</li><li>比特填充：发送端每遇到连续 5 个 1，就插入 1 个 0；接收端看到连续 5 个 1 后，如果下一个 bit 是 0 就删除。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>先找定界符：PPP/HDLC 常用 01111110。</li><li>再按方向判断：发送方向题目要插入填充位，接收方向题目要删除填充位。</li><li>最后验证：真正帧边界只在首尾出现，数据区不应再裸露定界符模式。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>链路层不能限制上层数据内容，所以必须让任何数据模式都能安全通过。</li><li>比特填充比直接删除定界符更稳，因为它只改变发送表示，接收端可逆恢复原始数据。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>若数据中出现 01111110，发送端不会让它原样进入帧数据区，而是在连续 5 个 1 后插入 0，使接收方不会误判为帧结束。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 368" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="366" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">发送方</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="346" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="378" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="430" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">链路</tspan>
+  </text>
+    <line x1="430" y1="50" x2="430" y2="346" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">接收方</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="346" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+        <path d="M 58 76 H 100 V 98 H 58" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="120" y="66" text-anchor="start" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="120" dy="0">扫描数据字段</tspan>
+  </text>
+        <text x="120" y="94" text-anchor="start" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="120" dy="0">发现 FLAG/ESC 或连续 5 个 1</tspan>
+  </text>
+      
+      <line x1="58" y1="130" x2="430" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="244" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">插入 ESC 或 bit 0</tspan>
+  </text>
+      <text x="244" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="244" dy="0">破坏伪边界模式</tspan>
+  </text>
+    
+      <line x1="430" y1="184" x2="802" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="616" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="616" dy="0">传输带填充的帧</tspan>
+  </text>
+      <text x="616" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="616" dy="0">首尾 FLAG 仍保留</tspan>
+  </text>
+    
+        <path d="M 802 238 H 760 V 260 H 802" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="740" y="228" text-anchor="end" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="740" dy="0">解填充</tspan>
+  </text>
+        <text x="740" y="256" text-anchor="end" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="740" dy="0">恢复原始数据</tspan>
+  </text>
+      
+        <path d="M 802 292 H 760 V 314 H 802" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="740" y="282" text-anchor="end" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="740" dy="0">交付网络层</tspan>
+  </text>
+        <text x="740" y="310" text-anchor="end" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="740" dy="0">只交付帧数据字段</tspan>
+  </text>
+      
+  </svg>
+        <figcaption>透明传输题按“发送端填充、接收端反向删除”做，不要把数据中的 FLAG 当帧边界。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>发送方/接收方状态</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>一侧</th><th>状态</th><th>事件</th><th>动作</th><th>设计原因</th></tr></thead>
+          <tbody>
+            <tr><td>发送方</td><td>普通扫描</td><td>读到普通字节/bit</td><td>原样输出</td><td>减少额外开销</td></tr><tr><td>发送方</td><td>普通扫描</td><td>读到 FLAG/ESC 或 5 个连续 1</td><td>插入 ESC 或 0</td><td>避免伪装成边界</td></tr><tr><td>接收方</td><td>帧内扫描</td><td>读到 ESC 或 5 个连续 1 后的 0</td><td>删除填充符</td><td>恢复上层原始数据</td></tr><tr><td>接收方</td><td>帧内扫描</td><td>读到未被填充的 FLAG</td><td>判定帧结束</td><td>边界检测唯一</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-3-2" class="detail-card" data-search="CRC 与汉明距离：检测题先写能力边界 考法：手算 CRC 余数，或问检测/纠正 r 位错误需要多大最小汉明距离。 CRC 把比特串看成模 2 多项式，发送端附加余数，使整帧能被生成多项式整除；汉明距离描述合法码字之间最少不同 bit 数。 CRC 除法用异或，不借位、不进位；生成多项式阶数为 r，就在数据后补 r 个 0。 接收端余数为 0 只表示“未检测到错误”，不是数学上保证绝对无错。 最小汉明距离 ds：检测 r 位错需要 ds &gt;= r + 1；纠正 r 位错需要 ds &gt;= 2r + 1。 CRC 题：写 D 后补 r 个 0，做模 2 除法，余数不足 r 位就在左侧补 0。 纠错题：看到“纠正”用 2r+1，看到“检测”用 r+1。 不要把 CRC 当纠错码；链路层常用 CRC 做检测，错了通常丢弃或请求重传。 CRC 适合硬件高速实现，能高概率检测突发错误。 汉明距离公式来自码字球半径：纠错需要错误球互不重叠，所以门槛更高。 题目问“纠正 2 bit 错误所需最小汉明距离”，直接写 ds &gt;= 2*2+1 = 5。">
+        <div class="detail-card-head">
+          <span>02</span>
+          <div>
+            <h2>CRC 与汉明距离：检测题先写能力边界</h2>
+            <p>考法：手算 CRC 余数，或问检测/纠正 r 位错误需要多大最小汉明距离。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>CRC 把比特串看成模 2 多项式，发送端附加余数，使整帧能被生成多项式整除；汉明距离描述合法码字之间最少不同 bit 数。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>CRC 除法用异或，不借位、不进位；生成多项式阶数为 r，就在数据后补 r 个 0。</li><li>接收端余数为 0 只表示“未检测到错误”，不是数学上保证绝对无错。</li><li>最小汉明距离 ds：检测 r 位错需要 ds &gt;= r + 1；纠正 r 位错需要 ds &gt;= 2r + 1。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>CRC 题：写 D 后补 r 个 0，做模 2 除法，余数不足 r 位就在左侧补 0。</li><li>纠错题：看到“纠正”用 2r+1，看到“检测”用 r+1。</li><li>不要把 CRC 当纠错码；链路层常用 CRC 做检测，错了通常丢弃或请求重传。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>CRC 适合硬件高速实现，能高概率检测突发错误。</li><li>汉明距离公式来自码字球半径：纠错需要错误球互不重叠，所以门槛更高。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>题目问“纠正 2 bit 错误所需最小汉明距离”，直接写 ds &gt;= 2*2+1 = 5。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 820 176" role="img" aria-label="协议流程示意图">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="818" height="174" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="22" y="28" font-size="12" font-weight="800" fill="#1f7a4d">流程顺序</text>
+    
+      <rect x="22" y="50" width="114.33333333333333" height="76" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <circle cx="39" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="39" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">1</text>
+      <text x="79.16666666666666" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="79.16666666666666" dy="0">数据 D</tspan>
+  </text>
+      <line x1="140.33333333333331" y1="88" x2="148.33333333333331" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="154.33333333333331" y="50" width="114.33333333333333" height="76" rx="8" fill="#f7fbf8" stroke="#b8cbc2"/>
+      <circle cx="171.33333333333331" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="171.33333333333331" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">2</text>
+      <text x="211.49999999999997" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="211.49999999999997" dy="0">后补 r 个 0</tspan>
+  </text>
+      <line x1="272.66666666666663" y1="88" x2="280.66666666666663" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="286.66666666666663" y="50" width="114.33333333333333" height="76" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <circle cx="303.66666666666663" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="303.66666666666663" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">3</text>
+      <text x="343.8333333333333" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="343.8333333333333" dy="0">模 2 除以 G</tspan>
+  </text>
+      <line x1="404.99999999999994" y1="88" x2="412.99999999999994" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="418.99999999999994" y="50" width="114.33333333333333" height="76" rx="8" fill="#f7fbf8" stroke="#b8cbc2"/>
+      <circle cx="435.99999999999994" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="435.99999999999994" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">4</text>
+      <text x="476.16666666666663" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="476.16666666666663" dy="0">得到 r 位余数 R</tspan>
+  </text>
+      <line x1="537.3333333333333" y1="88" x2="545.3333333333333" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="551.3333333333333" y="50" width="114.33333333333333" height="76" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <circle cx="568.3333333333333" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="568.3333333333333" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">5</text>
+      <text x="608.4999999999999" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="608.4999999999999" dy="0">发送 D+R</tspan>
+  </text>
+      <line x1="669.6666666666666" y1="88" x2="677.6666666666666" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="683.6666666666665" y="50" width="114.33333333333333" height="76" rx="8" fill="#f7fbf8" stroke="#b8cbc2"/>
+      <circle cx="700.6666666666665" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="700.6666666666665" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">6</text>
+      <text x="740.8333333333331" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="740.8333333333331" dy="0">接收端再除 G</tspan>
+  </text>
+      
+    
+  </svg>
+        <figcaption>CRC 图的价值在于提醒你：余数位数由生成多项式阶数决定，接收端重复同一除法。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-3-3" class="detail-card" data-search="以太网帧与 802.1Q：最小帧长、填充和 VLAN ID 考法：问 64B 最小帧、46B 最小载荷、IP 总长度 40B 时填充多少；VLAN 题问标签插在哪里。 以太网帧是 LAN 中 MAC 层传输单位；802.1Q 在源 MAC 后插入 4B 标签，用来在 trunk 链路中标识 VLAN。 以太网最小帧长 64B 通常不含前导码和 SFD，包含目的 MAC、源 MAC、类型、数据、FCS。 普通以太网头尾开销为 6+6+2+4=18B，所以数据字段最小 46B。 802.1Q 标签为 4B：TPID 2B + TCI 2B；TCI 内包含 PCP 3bit、DEI 1bit、VLAN ID 12bit。 填充题只看以太网数据字段是否小于 46B。 若 IP 数据报总长度就是以太网载荷长度，填充 = max(0, 46 - IP总长度)。 VLAN 帧题要记住标签位置：源 MAC 后、Type/Length 前。 最小帧长服务于 CSMA/CD 冲突检测：帧太短会导致发送方发完后才知道远端冲突。 VLAN ID 放在二层帧中，使一条 trunk 物理链路能承载多个逻辑广播域。 作业三中 IP 总长度 0x0028=40B，进入快速以太网时数据字段小于 46B，因此要补 6B；注意补的是以太网填充，不是 IP 总长度字段的一部分。">
+        <div class="detail-card-head">
+          <span>03</span>
+          <div>
+            <h2>以太网帧与 802.1Q：最小帧长、填充和 VLAN ID</h2>
+            <p>考法：问 64B 最小帧、46B 最小载荷、IP 总长度 40B 时填充多少；VLAN 题问标签插在哪里。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>以太网帧是 LAN 中 MAC 层传输单位；802.1Q 在源 MAC 后插入 4B 标签，用来在 trunk 链路中标识 VLAN。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>以太网最小帧长 64B 通常不含前导码和 SFD，包含目的 MAC、源 MAC、类型、数据、FCS。</li><li>普通以太网头尾开销为 6+6+2+4=18B，所以数据字段最小 46B。</li><li>802.1Q 标签为 4B：TPID 2B + TCI 2B；TCI 内包含 PCP 3bit、DEI 1bit、VLAN ID 12bit。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>填充题只看以太网数据字段是否小于 46B。</li><li>若 IP 数据报总长度就是以太网载荷长度，填充 = max(0, 46 - IP总长度)。</li><li>VLAN 帧题要记住标签位置：源 MAC 后、Type/Length 前。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>最小帧长服务于 CSMA/CD 冲突检测：帧太短会导致发送方发完后才知道远端冲突。</li><li>VLAN ID 放在二层帧中，使一条 trunk 物理链路能承载多个逻辑广播域。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>作业三中 IP 总长度 0x0028=40B，进入快速以太网时数据字段小于 46B，因此要补 6B；注意补的是以太网填充，不是 IP 总长度字段的一部分。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 318" role="img" aria-label="以太网帧字段长度">
+    <rect x="1" y="1" width="898" height="316" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="34" y="26" font-size="13" font-weight="900" fill="#1f7a4d">以太网帧字段长度</text>
+    <text x="876" y="26" text-anchor="end" font-size="11" font-weight="800" fill="#5f6f66">按字节/层边界标注，宽度仅作示意</text>
+    
+      <text x="34" y="46" font-size="12" font-weight="900" fill="#1f7a4d">Ethernet II</text>
+      
+          <rect x="34" y="58" width="154.36666666666667" height="56" rx="7" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="111.18333333333334" y="78" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="111.18333333333334" dy="0">Dst MAC</tspan>
+  </text>
+          <text x="111.18333333333334" y="100" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="111.18333333333334" dy="0">6B</tspan>
+  </text>
+        
+          <rect x="188.36666666666667" y="58" width="154.36666666666667" height="56" rx="7" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="265.55" y="78" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="265.55" dy="0">Src MAC</tspan>
+  </text>
+          <text x="265.55" y="100" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="265.55" dy="0">6B</tspan>
+  </text>
+        
+          <rect x="342.73333333333335" y="58" width="98.23333333333333" height="56" rx="7" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="391.85" y="78" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="391.85" dy="0">Type</tspan>
+  </text>
+          <text x="391.85" y="100" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="391.85" dy="0">2B</tspan>
+  </text>
+        
+          <rect x="440.9666666666667" y="58" width="322.76666666666665" height="56" rx="7" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="602.35" y="78" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="602.35" dy="0">Data</tspan>
+  </text>
+          <text x="602.35" y="100" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="602.35" dy="0">46-1500B</tspan>
+  </text>
+        
+          <rect x="763.7333333333333" y="58" width="112.26666666666667" height="56" rx="7" fill="#f3f0fb" stroke="#9fb8ad"/>
+          <text x="819.8666666666667" y="78" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="819.8666666666667" dy="0">FCS</tspan>
+  </text>
+          <text x="819.8666666666667" y="100" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="819.8666666666667" dy="0">4B</tspan>
+  </text>
+        
+    
+      <text x="34" y="128" font-size="12" font-weight="900" fill="#1f7a4d">802.1Q VLAN</text>
+      
+          <rect x="34" y="140" width="134.23188405797103" height="56" rx="7" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="101.11594202898551" y="160" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="101.11594202898551" dy="0">Dst MAC</tspan>
+  </text>
+          <text x="101.11594202898551" y="182" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="101.11594202898551" dy="0">6B</tspan>
+  </text>
+        
+          <rect x="168.23188405797103" y="140" width="134.23188405797103" height="56" rx="7" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="235.34782608695656" y="160" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="235.34782608695656" dy="0">Src MAC</tspan>
+  </text>
+          <text x="235.34782608695656" y="182" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="235.34782608695656" dy="0">6B</tspan>
+  </text>
+        
+          <rect x="302.46376811594206" y="140" width="109.82608695652176" height="56" rx="7" fill="#fff6e8" stroke="#9fb8ad"/>
+          <text x="357.37681159420293" y="160" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="357.37681159420293" dy="0">802.1Q Tag</tspan>
+  </text>
+          <text x="357.37681159420293" y="182" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="357.37681159420293" dy="0">4B</tspan>
+  </text>
+        
+          <rect x="412.2898550724638" y="140" width="85.42028985507247" height="56" rx="7" fill="#f3f0fb" stroke="#9fb8ad"/>
+          <text x="455.00000000000006" y="160" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="455.00000000000006" dy="0">Type</tspan>
+  </text>
+          <text x="455.00000000000006" y="182" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="455.00000000000006" dy="0">2B</tspan>
+  </text>
+        
+          <rect x="497.71014492753625" y="140" width="280.6666666666667" height="56" rx="7" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="638.0434782608696" y="160" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="638.0434782608696" dy="0">Data</tspan>
+  </text>
+          <text x="638.0434782608696" y="182" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="638.0434782608696" dy="0">46-1500B</tspan>
+  </text>
+        
+          <rect x="778.376811594203" y="140" width="97.62318840579711" height="56" rx="7" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="827.1884057971015" y="160" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="827.1884057971015" dy="0">FCS</tspan>
+  </text>
+          <text x="827.1884057971015" y="182" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="750" fill="#5f6f66">
+    <tspan x="827.1884057971015" dy="0">4B</tspan>
+  </text>
+        
+    
+    
+    <text x="34" y="242" font-size="12" font-weight="750" fill="#5f6f66">最小帧长 64B = 6B 目的 MAC + 6B 源 MAC + 2B 类型 + 至少 46B 数据 + 4B FCS。</text>
+  
+    <text x="34" y="260" font-size="12" font-weight="750" fill="#5f6f66">前导码 7B 和 SFD 1B 通常不计入 64B；IP 总长度 40B 作载荷时需二层填充 6B。</text>
+  
+    <text x="34" y="278" font-size="12" font-weight="750" fill="#5f6f66">802.1Q Tag 插在源 MAC 后、Type 前。</text>
+  
+  </svg>
+        <figcaption>Preamble/SFD 用于物理同步，通常不计入 64B 最小以太网帧长；802.1Q 标签会让帧头多 4B。</figcaption>
+      </figure>
+    
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg wide-diagram" viewBox="0 0 900 196" role="img" aria-label="802.1Q TCI 字段">
+    <rect x="1" y="1" width="898" height="194" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="54" y="22" font-size="13" font-weight="900" fill="#1f7a4d">802.1Q TCI 字段</text>
+    <text x="876" y="22" text-anchor="end" font-size="11" font-weight="800" fill="#5f6f66">每行 16 bit，数字为 bit 位置</text>
+    
+      <line x1="54" y1="38" x2="54" y2="52" stroke="#b8cbc2"/>
+      <text x="54" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">0</text>
+    
+      <line x1="156.75" y1="38" x2="156.75" y2="52" stroke="#b8cbc2"/>
+      <text x="156.75" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">2</text>
+    
+      <line x1="208.125" y1="38" x2="208.125" y2="52" stroke="#b8cbc2"/>
+      <text x="208.125" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">3</text>
+    
+      <line x1="259.5" y1="38" x2="259.5" y2="52" stroke="#b8cbc2"/>
+      <text x="259.5" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">4</text>
+    
+      <line x1="876" y1="38" x2="876" y2="52" stroke="#b8cbc2"/>
+      <text x="876" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#5f6f66">15</text>
+    
+    
+      <text x="22" y="88" text-anchor="start" font-size="11" font-weight="900" fill="#5f6f66">+0</text>
+      
+          <rect x="54" y="58" width="154.125" height="56" fill="#eaf6ef" stroke="#9fb8ad"/>
+          <text x="131.0625" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="131.0625" dy="0">PCP</tspan><tspan x="131.0625" dy="13">3 bit</tspan>
+  </text>
+          <text x="131.0625" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="131.0625" dy="0">优先级</tspan>
+  </text>
+        
+          <rect x="208.125" y="58" width="51.375" height="56" fill="#f7fbf8" stroke="#9fb8ad"/>
+          <text x="233.8125" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="233.8125" dy="0">DEI</tspan><tspan x="233.8125" dy="13">1 bit</tspan>
+  </text>
+          <text x="233.8125" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="233.8125" dy="0">丢弃指示</tspan>
+  </text>
+        
+          <rect x="259.5" y="58" width="616.5" height="56" fill="#ecf4f6" stroke="#9fb8ad"/>
+          <text x="567.75" y="73.5" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#17201b">
+    <tspan x="567.75" dy="0">VLAN ID</tspan><tspan x="567.75" dy="13">12 bit</tspan>
+  </text>
+          <text x="567.75" y="102" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#5f6f66">
+    <tspan x="567.75" dy="0">0-4095, 常用 1-4094</tspan>
+  </text>
+        
+    
+    
+    <text x="54" y="156" font-size="12" font-weight="750" fill="#5f6f66">TCI 是 16 bit：PCP 3bit + DEI 1bit + VLAN ID 12bit。</text>
+  
+  </svg>
+        <figcaption>802.1Q 的 16-bit TCI 必须能读出 VLAN ID 是 12 bit，这比只画一个“Tag”有用。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      <article id="detail-3-4" class="detail-card" data-search="CSMA/CD：状态过程和最小帧长为什么绑定 考法：解释先听后发/边发边听，计算最小帧长或判断短帧为什么危险。 CSMA/CD 是共享式以太网的随机访问协议：发送前监听信道，发送中检测冲突，冲突后发送 jam 信号并随机退避。 最小帧发送时间必须 &gt;= 最坏情况下冲突往返传播时延 2τ。 若 L/R &lt; 2τ，发送方可能已经发完并认为成功，但远端冲突信号还没传回来。 交换式全双工以太网通常不再运行 CSMA/CD，但考试用它考传播时延、传输时延与冲突检测边界。 计算题写 Lmin/R &gt;= 2d/v，整理得 Lmin &gt;= 2dR/v。 单位统一：R 用 bit/s，传播速度 v 用 m/s，距离 d 用 m。 若题目问有效速率，要额外考虑冲突、退避、帧间隔等开销。 冲突检测不是事后统计，而是要求发送方还在发送时就能听到冲突。 退避随机化是为了避免两个站点碰撞后再次同步重发、反复碰撞。 以太网 64B 最小帧可理解为在典型最大网络直径和 10Mbps 速率下，为冲突检测留出的下界。">
+        <div class="detail-card-head">
+          <span>04</span>
+          <div>
+            <h2>CSMA/CD：状态过程和最小帧长为什么绑定</h2>
+            <p>考法：解释先听后发/边发边听，计算最小帧长或判断短帧为什么危险。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>CSMA/CD 是共享式以太网的随机访问协议：发送前监听信道，发送中检测冲突，冲突后发送 jam 信号并随机退避。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>最小帧发送时间必须 &gt;= 最坏情况下冲突往返传播时延 2τ。</li><li>若 L/R &lt; 2τ，发送方可能已经发完并认为成功，但远端冲突信号还没传回来。</li><li>交换式全双工以太网通常不再运行 CSMA/CD，但考试用它考传播时延、传输时延与冲突检测边界。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>计算题写 Lmin/R &gt;= 2d/v，整理得 Lmin &gt;= 2dR/v。</li><li>单位统一：R 用 bit/s，传播速度 v 用 m/s，距离 d 用 m。</li><li>若题目问有效速率，要额外考虑冲突、退避、帧间隔等开销。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>冲突检测不是事后统计，而是要求发送方还在发送时就能听到冲突。</li><li>退避随机化是为了避免两个站点碰撞后再次同步重发、反复碰撞。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>以太网 64B 最小帧可理解为在典型最大网络直径和 10Mbps 速率下，为冲突检测留出的下界。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 368" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="366" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">站点 A</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="346" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="378" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="430" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">共享介质</tspan>
+  </text>
+    <line x1="430" y1="50" x2="430" y2="346" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">站点 B</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="346" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="430" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="244" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">t=0 发送</tspan>
+  </text>
+      <text x="244" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="244" dy="0">A 监听到空闲</tspan>
+  </text>
+    
+      <line x1="802" y1="130" x2="430" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="616" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="616" dy="0">几乎同时发送</tspan>
+  </text>
+      <text x="616" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="616" dy="0">B 也监听到空闲</tspan>
+  </text>
+    
+        <path d="M 430 184 H 472 V 206 H 430" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="492" y="174" text-anchor="start" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="492" dy="0">信号相遇</tspan>
+  </text>
+        <text x="492" y="202" text-anchor="start" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="492" dy="0">介质上发生冲突</tspan>
+  </text>
+      
+      <line x1="430" y1="238" x2="58" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="244" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="244" dy="0">冲突传播回 A</tspan>
+  </text>
+      <text x="244" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="244" dy="0">最坏约 2τ</tspan>
+  </text>
+    
+        <path d="M 58 292 H 100 V 314 H 58" fill="none" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+        <text x="120" y="282" text-anchor="start" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="120" dy="0">Jam + 退避</tspan>
+  </text>
+        <text x="120" y="310" text-anchor="start" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="120" dy="0">停止本次发送</tspan>
+  </text>
+      
+  </svg>
+        <figcaption>最远两端同时发送时，A 必须在发送结束前收到冲突返回信号，所以需要覆盖 2τ。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>发送方状态转移</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>状态</th><th>事件</th><th>动作</th><th>下一状态</th><th>设计原因</th></tr></thead>
+          <tbody>
+            <tr><td>监听</td><td>信道空闲</td><td>开始发送</td><td>发送中</td><td>减少明显冲突</td></tr><tr><td>监听</td><td>信道忙</td><td>继续等待</td><td>监听</td><td>避免立刻叠加冲突</td></tr><tr><td>发送中</td><td>未检测到冲突且发完</td><td>认为发送成功</td><td>监听</td><td>共享介质无链路层 ACK</td></tr><tr><td>发送中</td><td>检测到冲突</td><td>发送 jam，停止发送</td><td>退避</td><td>让所有站点知道本次失败</td></tr><tr><td>退避</td><td>随机退避结束</td><td>重新监听</td><td>监听</td><td>降低再次同步碰撞概率</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-3-5" class="detail-card" data-search="可靠传输：停等、GBN、SR 的发送方/接收方状态 考法：给窗口和丢包事件，问 ACK 含义、重传哪些帧、序号空间约束。 可靠传输用序号、ACK、定时器和重传机制，在可能丢帧/乱序的链路上实现可靠交付。 停等协议一次只允许 1 个未确认帧，状态最简单，但 RTT 大时利用率低。 GBN 发送窗口可大于 1，接收窗口 Wr=1，只接收按序帧；乱序帧丢弃，ACK 是累计确认。 SR 发送方和接收方都有窗口，接收方缓存乱序帧，ACK 是逐帧确认；窗口通常 &lt;= 序号空间一半。 GBN 丢第 k 帧：接收方丢弃 k 之后的乱序帧，发送方超时后从 k 回退重传。 SR 丢第 k 帧：接收方可缓存 k 之后的帧，发送方只重传 k 或超时帧。 窗口大小题：GBN Ws &lt;= 2^k - 1；SR W &lt;= 2^(k-1)。 GBN 牺牲带宽重传来换取接收端简单，不需要乱序缓存。 SR 牺牲接收端缓存和更复杂 ACK，换取更少无谓重传。 k=3 位序号时，GBN 最大发送窗口 7；SR 单边窗口通常最多 4，否则新旧同序号帧可能混淆。">
+        <div class="detail-card-head">
+          <span>05</span>
+          <div>
+            <h2>可靠传输：停等、GBN、SR 的发送方/接收方状态</h2>
+            <p>考法：给窗口和丢包事件，问 ACK 含义、重传哪些帧、序号空间约束。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>可靠传输用序号、ACK、定时器和重传机制，在可能丢帧/乱序的链路上实现可靠交付。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>停等协议一次只允许 1 个未确认帧，状态最简单，但 RTT 大时利用率低。</li><li>GBN 发送窗口可大于 1，接收窗口 Wr=1，只接收按序帧；乱序帧丢弃，ACK 是累计确认。</li><li>SR 发送方和接收方都有窗口，接收方缓存乱序帧，ACK 是逐帧确认；窗口通常 &lt;= 序号空间一半。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>GBN 丢第 k 帧：接收方丢弃 k 之后的乱序帧，发送方超时后从 k 回退重传。</li><li>SR 丢第 k 帧：接收方可缓存 k 之后的帧，发送方只重传 k 或超时帧。</li><li>窗口大小题：GBN Ws &lt;= 2^k - 1；SR W &lt;= 2^(k-1)。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>GBN 牺牲带宽重传来换取接收端简单，不需要乱序缓存。</li><li>SR 牺牲接收端缓存和更复杂 ACK，换取更少无谓重传。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>k=3 位序号时，GBN 最大发送窗口 7；SR 单边窗口通常最多 4，否则新旧同序号帧可能混淆。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 860 422" role="img" aria-label="协议交互示意图">
+    <defs>
+      <marker id="seqArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="858" height="420" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    
+    <rect x="6" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="58" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="58" dy="0">GBN 发送方</tspan>
+  </text>
+    <line x1="58" y1="50" x2="58" y2="400" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    <rect x="750" y="18" width="104" height="30" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+    <text x="802" y="33" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="802" dy="0">GBN 接收方</tspan>
+  </text>
+    <line x1="802" y1="50" x2="802" y2="400" stroke="#c9d8d0" stroke-dasharray="5 6"/>
+  
+    
+      <line x1="58" y1="76" x2="802" y2="76" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="66" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Frame 0</tspan>
+  </text>
+      <text x="430" y="93" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">expected=0, 接收</tspan>
+  </text>
+    
+      <line x1="802" y1="130" x2="58" y2="130" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="120" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">ACK 1</tspan>
+  </text>
+      <text x="430" y="147" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">下一个期待 1</tspan>
+  </text>
+    
+      <line x1="58" y1="184" x2="802" y2="184" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="174" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Frame 1 丢失</tspan>
+  </text>
+      <text x="430" y="201" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">expected 仍为 1</tspan>
+  </text>
+    
+      <line x1="58" y1="238" x2="802" y2="238" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="228" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Frame 2 到达</tspan>
+  </text>
+      <text x="430" y="255" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">乱序, 丢弃</tspan>
+  </text>
+    
+      <line x1="802" y1="292" x2="58" y2="292" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="282" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">ACK 1</tspan>
+  </text>
+      <text x="430" y="309" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">重复累计 ACK</tspan>
+  </text>
+    
+      <line x1="58" y1="346" x2="802" y2="346" stroke="#146c73" stroke-width="2.2" marker-end="url(#seqArrow)"/>
+      <text x="430" y="336" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="430" dy="0">Timeout 后重传 1,2,...</tspan>
+  </text>
+      <text x="430" y="363" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="650" fill="#5f6f66">
+    <tspan x="430" dy="0">回退 N 帧</tspan>
+  </text>
+    
+  </svg>
+        <figcaption>GBN 的关键是接收方只认 expectedseqnum，乱序帧到达也不推进窗口。</figcaption>
+      </figure>
+    
+        
+    <section class="detail-table-wrap">
+      <h4>GBN 状态转移</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>一侧</th><th>状态变量</th><th>事件</th><th>动作</th><th>下一状态/原因</th></tr></thead>
+          <tbody>
+            <tr><td>发送方</td><td>base, nextseqnum</td><td>上层有数据且窗口未满</td><td>发送帧，nextseqnum++</td><td>流水线提高利用率</td></tr><tr><td>发送方</td><td>base, nextseqnum</td><td>收到 ACK n</td><td>base 移到 n</td><td>累计确认 n 之前全收到</td></tr><tr><td>发送方</td><td>base, nextseqnum</td><td>base 定时器超时</td><td>重传 base 到 nextseqnum-1</td><td>接收方不缓存乱序帧</td></tr><tr><td>接收方</td><td>expectedseqnum</td><td>收到期望帧</td><td>交付上层，expected++，ACK expected</td><td>只交付有序数据</td></tr><tr><td>接收方</td><td>expectedseqnum</td><td>收到乱序帧</td><td>丢弃，重复 ACK expected</td><td>保持接收端简单</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+    <section class="detail-table-wrap">
+      <h4>SR 状态转移</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>一侧</th><th>状态变量</th><th>事件</th><th>动作</th><th>设计原因</th></tr></thead>
+          <tbody>
+            <tr><td>发送方</td><td>每帧定时器</td><td>某帧超时</td><td>只重传该帧</td><td>减少无谓重传</td></tr><tr><td>发送方</td><td>发送窗口</td><td>收到某帧 ACK</td><td>标记该帧已确认；若 base 已确认则滑动</td><td>允许乱序确认</td></tr><tr><td>接收方</td><td>接收窗口</td><td>窗口内乱序帧到达</td><td>缓存并单独 ACK</td><td>等待缺口补齐</td></tr><tr><td>接收方</td><td>接收窗口</td><td>base 帧到达</td><td>交付连续可交付帧并滑动窗口</td><td>保持上层按序交付</td></tr><tr><td>接收方</td><td>接收窗口</td><td>窗口外旧帧到达</td><td>可重发 ACK 但不交付</td><td>避免重复交付</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  
+        
+      </article>
+    
+      <article id="detail-3-6" class="detail-card" data-search="交换机、VLAN、PPP：按动作顺序答题 考法：交换机收到帧后学习/转发/过滤/泛洪；VLAN 隔离广播域；PPP 提供哪些功能。 交换机是链路层设备，基于源 MAC 自学习，基于目的 MAC 转发；VLAN 在二层逻辑隔离广播域；PPP 是点到点链路层协议。 交换机先学习源 MAC 到入端口，再查目的 MAC。 目的端口未知就泛洪；已知且不同于入端口就转发；已知且等于入端口就过滤。 PPP 提供成帧、透明传输、差错检测和链路控制，但不提供可靠重传和流量控制。 交换机题不要先查目的地址，必须先写学习源地址。 VLAN 题先判断端口类型：access 不带标签接主机，trunk 带 VLAN ID 接交换机。 PPP 功能题用排除法：它不是 TCP，不负责端到端可靠传输。 自学习让交换机即插即用，不需要手工配置完整 MAC 表。 VLAN 用逻辑划分替代物理拆网，降低布线成本，也限制广播范围。 A 从端口 1 发给未知的 B，交换机记录 A-&gt;1，然后向除端口 1 之外的端口泛洪；之后 B 回复时，交换机学到 B 的端口。">
+        <div class="detail-card-head">
+          <span>06</span>
+          <div>
+            <h2>交换机、VLAN、PPP：按动作顺序答题</h2>
+            <p>考法：交换机收到帧后学习/转发/过滤/泛洪；VLAN 隔离广播域；PPP 提供哪些功能。</p>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <section>
+            <h3>定义</h3>
+            <p>交换机是链路层设备，基于源 MAC 自学习，基于目的 MAC 转发；VLAN 在二层逻辑隔离广播域；PPP 是点到点链路层协议。</p>
+          </section>
+          <section>
+            <h3>解释</h3>
+            <ul><li>交换机先学习源 MAC 到入端口，再查目的 MAC。</li><li>目的端口未知就泛洪；已知且不同于入端口就转发；已知且等于入端口就过滤。</li><li>PPP 提供成帧、透明传输、差错检测和链路控制，但不提供可靠重传和流量控制。</li></ul>
+          </section>
+          <section>
+            <h3>做题步骤</h3>
+            <ul><li>交换机题不要先查目的地址，必须先写学习源地址。</li><li>VLAN 题先判断端口类型：access 不带标签接主机，trunk 带 VLAN ID 接交换机。</li><li>PPP 功能题用排除法：它不是 TCP，不负责端到端可靠传输。</li></ul>
+          </section>
+          <section>
+            <h3>为什么这样设计</h3>
+            <ul><li>自学习让交换机即插即用，不需要手工配置完整 MAC 表。</li><li>VLAN 用逻辑划分替代物理拆网，降低布线成本，也限制广播范围。</li></ul>
+          </section>
+        </div>
+        <section class="example-strip">
+          <h3>作业/考试例子</h3>
+          <p>A 从端口 1 发给未知的 B，交换机记录 A-&gt;1，然后向除端口 1 之外的端口泛洪；之后 B 回复时，交换机学到 B 的端口。</p>
+        </section>
+        
+      <figure class="diagram detail-diagram">
+        <svg class="diagram-svg" viewBox="0 0 820 176" role="img" aria-label="协议流程示意图">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c73"/>
+      </marker>
+    </defs>
+    <rect x="1" y="1" width="818" height="174" rx="10" fill="#ffffff" stroke="#d8e2dc"/>
+    <text x="22" y="28" font-size="12" font-weight="800" fill="#1f7a4d">流程顺序</text>
+    
+      <rect x="22" y="50" width="140.8" height="76" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <circle cx="39" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="39" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">1</text>
+      <text x="92.4" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="92.4" dy="0">收到以太网帧</tspan>
+  </text>
+      <line x1="166.8" y1="88" x2="174.8" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="180.8" y="50" width="140.8" height="76" rx="8" fill="#f7fbf8" stroke="#b8cbc2"/>
+      <circle cx="197.8" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="197.8" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">2</text>
+      <text x="251.20000000000002" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="251.20000000000002" dy="0">学习 源MAC-&gt;入端口</tspan>
+  </text>
+      <line x1="325.6" y1="88" x2="333.6" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="339.6" y="50" width="140.8" height="76" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <circle cx="356.6" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="356.6" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">3</text>
+      <text x="410" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="410" dy="0">查目的 MAC</tspan>
+  </text>
+      <line x1="484.40000000000003" y1="88" x2="492.40000000000003" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="498.40000000000003" y="50" width="140.8" height="76" rx="8" fill="#f7fbf8" stroke="#b8cbc2"/>
+      <circle cx="515.4000000000001" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="515.4000000000001" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">4</text>
+      <text x="568.8000000000001" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="568.8000000000001" dy="0">目的未知: 泛洪</tspan>
+  </text>
+      <line x1="643.2" y1="88" x2="651.2" y2="88" stroke="#146c73" stroke-width="2.4" marker-end="url(#arrow)"/>
+    
+      <rect x="657.2" y="50" width="140.8" height="76" rx="8" fill="#eef6f1" stroke="#b8cbc2"/>
+      <circle cx="674.2" cy="68" r="10" fill="#1f7a4d"/>
+      <text x="674.2" y="68" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="900" fill="#ffffff">5</text>
+      <text x="727.6" y="91" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="#17201b">
+    <tspan x="727.6" dy="0">目的已知: 转发或过滤</tspan>
+  </text>
+      
+    
+  </svg>
+        <figcaption>交换机答题顺序固定：学习源 MAC -&gt; 查目的 MAC -&gt; 决定过滤/转发/泛洪。</figcaption>
+      </figure>
+    
+        
+        
+      </article>
+    
+      </div>
+    </section>
+  </main>
+
+  <script>
+const key = document.body.dataset.storage || "network-review";
+const state = JSON.parse(localStorage.getItem(key) || "{}");
+const checks = [...document.querySelectorAll("[data-check]")];
+const notes = document.getElementById("notes");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+let onlyUnmastered = false;
+
+function save() {
+  const mastered = checks.map((input) => input.checked);
+  localStorage.setItem(key, JSON.stringify({ mastered, notes: notes?.value || "" }));
+}
+
+function updateProgress() {
+  const done = checks.filter((input) => input.checked).length;
+  const total = checks.length || 1;
+  const percent = Math.round((done / total) * 100);
+  if (progressText) progressText.textContent = percent + "%";
+  if (progressBar) progressBar.style.width = percent + "%";
+  checks.forEach((input) => {
+    const row = input.closest(".check-row");
+    row?.classList.toggle("mastered", input.checked);
+    if (onlyUnmastered) row.hidden = input.checked;
+  });
+}
+
+checks.forEach((input, index) => {
+  input.checked = Boolean(state.mastered?.[index]);
+  input.addEventListener("change", () => {
+    save();
+    updateProgress();
+  });
+});
+if (notes) {
+  notes.value = state.notes || "";
+  notes.addEventListener("input", save);
+}
+updateProgress();
+
+document.querySelectorAll(".topic-head").forEach((button) => {
+  button.addEventListener("click", () => {
+    const body = button.parentElement.querySelector(".topic-body");
+    const isOpen = body.classList.toggle("open");
+    button.setAttribute("aria-expanded", String(isOpen));
+  });
+});
+
+document.querySelectorAll(".qa-question").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.parentElement.querySelector(".qa-answer")?.classList.toggle("open");
+  });
+});
+
+document.getElementById("expandAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.add("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "true"));
+});
+
+document.getElementById("collapseAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.remove("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "false"));
+});
+
+document.getElementById("toggleUnmastered")?.addEventListener("click", (event) => {
+  onlyUnmastered = !onlyUnmastered;
+  event.currentTarget.classList.toggle("active", onlyUnmastered);
+  updateProgress();
+});
+
+document.getElementById("searchInput")?.addEventListener("input", (event) => {
+  const q = event.target.value.trim().toLowerCase();
+  document.querySelectorAll("[data-search]").forEach((node) => {
+    node.hidden = q && !node.dataset.search.toLowerCase().includes(q);
+  });
+});
+
+document.getElementById("copySummary")?.addEventListener("click", async () => {
+  const pending = checks
+    .filter((input) => !input.checked)
+    .map((input) => "- " + input.closest(".check-row").innerText.trim())
+    .join("\n");
+  const text = [
+    document.querySelector("h1")?.innerText || "计算机网络复习",
+    "",
+    "未掌握清单:",
+    pending || "- 已全部勾选",
+    "",
+    "我的补充:",
+    notes?.value || ""
+  ].join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+  } catch {
+    document.getElementById("copyStatus").textContent = "浏览器限制复制，请手动选择文本。";
+  }
+});
+
+function formatSeconds(value) {
+  if (!Number.isFinite(value)) return "无法计算";
+  if (value >= 3600) return (value / 3600).toFixed(2) + " h";
+  if (value >= 60) return (value / 60).toFixed(2) + " min";
+  return value.toFixed(2) + " s";
+}
+
+function updateP2P() {
+  const box = document.querySelector('[data-tool="p2p"]');
+  if (!box) return;
+  const read = (name) => Number(box.querySelector('[data-p2p="' + name + '"]')?.value || 0);
+  const Fbits = read("F") * 1e9;
+  const N = read("N");
+  const us = read("us") * 1e6;
+  const dmin = read("dmin") * 1e6;
+  const u = read("u") * 1e6;
+  const sumPeer = N * u;
+  const dcs = Math.max((N * Fbits) / us, Fbits / dmin);
+  const dp2p = Math.max(Fbits / us, Fbits / dmin, (N * Fbits) / (us + sumPeer));
+  const serverTerm = (N * Fbits) / us;
+  const result = box.querySelector("#p2pResult");
+  if (result) {
+    result.innerHTML = [
+      "Dcs = max(NF/us, F/dmin) = " + formatSeconds(dcs),
+      "Dp2p = max(F/us, F/dmin, NF/(us+N*u)) = " + formatSeconds(dp2p),
+      "C/S 服务器上传项 NF/us = " + formatSeconds(serverTerm)
+    ].join("<br>");
+  }
+}
+
+document.querySelectorAll("[data-p2p]").forEach((input) => {
+  input.addEventListener("input", updateP2P);
+});
+updateP2P();
+</script>
+</body>
+</html>

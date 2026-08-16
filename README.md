@@ -18,6 +18,10 @@
 - 李全龙
   <!-- TOML-ITEM: id="review-李全龙-1" -->
   - 本部来的老师，哈工大计网 MOOC 的领头人。
+   <!-- TOML-ITEM: id="review-王京华-1" -->
+- 王京华
+  <!-- TOML-ITEM: id="review-王京华-1" -->
+  - 26年23AISZ班授课老师，人特别好不会紧抓考勤。
 
 ## 在线资源
 <!-- TOML-SECTION: title="在线资源" -->
@@ -25,6 +29,16 @@
 <!-- TOML-ITEM: id="item-在线资源-1" -->
 
 - [本部 MOOC](https://www.icourse163.org/course/HIT-154005)：内容以及教授顺序都与上课不太一样，但是 PPT 基本相似，可以作为参考。
+
+## 学习资料
+<!-- TOML-SECTION: title="学习资料" -->
+
+<!-- TOML-ITEM: id="item-学习资料-1" -->
+
+- [2026 年 AISZ-23 复习资料总览](notes/2026_AISZ-23-CS-Reviews/index.html)：第 1–7 章总结，第 1–3 章交互页，以及第 3–6 章详细讲解
+- `notes/2026_AISZ-23-CS-Reviews/知识清单/` 与 `章节测试/`：覆盖 Chapter 1–7 的知识清单和交互式章节测试
+- HTML 可直接用浏览器打开；部分公式由 MathJax 渲染，首次加载需要联网
+- 资料来源：[MukioXun/AISZ-23-CS-Review-Materials](https://github.com/MukioXun/AISZ-23-CS-Review-Materials)
 
 ## 课程内容
 <!-- TOML-SECTION: title="课程内容" -->

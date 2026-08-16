@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第7章 无线与移动网络 - 计算机网络复习</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #17201b;
+  --muted: #5f6f66;
+  --line: #d8e2dc;
+  --paper: #fbfdfb;
+  --soft: #eef6f1;
+  --green: #1f7a4d;
+  --teal: #146c73;
+  --amber: #a75f00;
+  --red: #b2422b;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.62;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #f7fbf8, #edf7f3);
+}
+.back-link {
+  position: absolute;
+  top: 14px;
+  left: clamp(18px, 4vw, 56px);
+  font-size: 14px;
+  font-weight: 700;
+}
+.title-block { max-width: 940px; padding-top: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1, h2 { letter-spacing: 0; }
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.12;
+}
+h2 {
+  margin: 28px 0 12px;
+  font-size: 22px;
+}
+p { margin: 0 0 10px; }
+.progress-panel {
+  min-width: 168px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.progress-panel strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.progress-panel span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  background: #e5ece8;
+  border-radius: 999px;
+}
+#progressBar {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+main {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+.chapter-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 14px;
+}
+.chapter-nav a,
+.tool-strip button,
+.tool-link,
+.card-actions a,
+#copySummary {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.chapter-nav a.active,
+.tool-strip button.active,
+#copySummary {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.tool-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin: 8px 0 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.search-box {
+  display: grid;
+  gap: 4px;
+  min-width: min(420px, 100%);
+  flex: 1;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+input[type="search"], textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+input[type="search"] { min-height: 40px; padding: 8px 12px; }
+textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.meta-grid,
+.index-grid,
+.homework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meta-grid article,
+.index-card,
+.homework-card,
+.detail-entry,
+.topic-card,
+.formula-card,
+.qa-card,
+.side-panel,
+.warning-box {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 8px;
+}
+.meta-grid article { padding: 16px; }
+.meta-grid h2,
+.homework-head h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+ul { margin: 8px 0 0; padding-left: 20px; }
+li + li { margin-top: 6px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+}
+.main-column { min-width: 0; }
+.topic-card { margin-bottom: 10px; overflow: hidden; }
+.topic-head,
+.qa-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 0;
+  background: var(--white);
+  padding: 14px 16px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.chevron { color: var(--green); font-weight: 900; }
+.topic-body { display: none; padding: 0 16px 16px; }
+.topic-body.open { display: block; }
+.formula-grid,
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.focus-section { margin: 0 0 8px; }
+.focus-grid {
+  display: grid;
+  gap: 14px;
+}
+.focus-card {
+  border: 1px solid #c9d8d0;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.focus-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.focus-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.focus-head h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.focus-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.concept-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.concept-box strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: 13px;
+}
+.concept-box p:last-child,
+.concept-box ul:last-child {
+  margin-bottom: 0;
+}
+.example-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+}
+.diagram {
+  margin: 0 14px 14px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.diagram figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.formula-card,
+.qa-card { padding: 14px; }
+.formula-name {
+  color: var(--green);
+  font-weight: 800;
+}
+code {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: #1d3d2a;
+}
+.warning-box {
+  border-color: #e7c9a3;
+  background: #fffaf2;
+  padding: 14px 16px;
+}
+.warning-box li::marker { color: var(--amber); }
+.detail-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 16px;
+  border-color: #c9d8d0;
+  background: #f7fbf8;
+}
+.detail-entry h2 { margin: 0 0 6px; }
+.detail-entry a,
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 800;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.detail-toc {
+  position: sticky;
+  top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-toc h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.detail-toc a {
+  display: block;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-main { min-width: 0; }
+.detail-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: var(--white);
+}
+.detail-card-head {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fbf8;
+}
+.detail-card-head > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.detail-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.detail-card-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  padding: 16px;
+}
+.detail-grid h3,
+.example-strip h3 {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 14px;
+}
+.detail-grid p,
+.example-strip p {
+  margin-bottom: 0;
+}
+.example-strip {
+  margin: 0 16px 16px;
+  padding: 12px;
+  border-left: 4px solid #e7c9a3;
+  background: #fffaf2;
+}
+.detail-diagram { margin-top: 0; }
+.detail-table-wrap {
+  margin: 0 16px 16px;
+}
+.detail-table-wrap h4,
+.interactive-head h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th {
+  background: var(--soft);
+  color: #1d3d2a;
+  font-weight: 900;
+}
+tr:last-child td { border-bottom: 0; }
+.interactive-box {
+  margin: 0 16px 16px;
+  padding: 14px;
+  border: 1px solid #c9d8d0;
+  border-radius: 8px;
+  background: #f7fbf8;
+}
+.interactive-head p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.calc-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calc-grid input {
+  min-height: 38px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+.calc-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 800;
+}
+.wide-diagram { min-width: 820px; }
+.qa-card { padding: 0; overflow: hidden; }
+.qa-answer {
+  display: none;
+  margin: 0;
+  padding: 0 14px 14px;
+  color: var(--muted);
+}
+.qa-answer.open { display: block; }
+.side-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+}
+.side-panel h2:first-child { margin-top: 0; }
+.checks {
+  display: grid;
+  gap: 8px;
+}
+.check-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.check-row.mastered {
+  color: var(--muted);
+  background: var(--soft);
+}
+.check-row input { margin-top: 5px; accent-color: var(--green); }
+.copy-status { min-height: 22px; color: var(--green); font-size: 13px; }
+.index-hero { align-items: center; }
+.index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 16px;
+}
+.index-card h2 { margin: 0 0 8px; }
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+.homework-section { margin-top: 28px; }
+.section-title h2 { margin-top: 0; }
+.homework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.homework-card { padding: 16px; }
+.homework-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.homework-head span,
+.chapter-tags {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  .topbar,
+  .layout,
+  .detail-layout,
+  .detail-entry,
+  .meta-grid,
+  .index-grid,
+  .homework-grid,
+  .formula-grid,
+  .qa-grid,
+  .concept-grid,
+  .detail-grid,
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .progress-panel { width: 100%; }
+  .side-panel { position: static; }
+  .detail-toc { position: static; }
+  .index-card { grid-template-columns: 1fr; }
+  .card-actions { flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body data-storage="network-review-ch7">
+  <header class="topbar">
+    <a class="back-link" href="index.html">返回总览</a>
+    <div class="title-block">
+      <p class="eyebrow">Chapter 7</p>
+      <h1>第7章 无线与移动网络</h1>
+      <p>期末可能考概念和过程: 无线链路特性、802.11 体系结构、CSMA/CA、RTS/CTS、地址字段、移动管理。</p>
+    </div>
+    <div class="progress-panel">
+      <strong id="progressText">0%</strong>
+      <span>掌握度</span>
+      <div class="progress-track"><div id="progressBar"></div></div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a class="" href="chapter1-summary.html">第1章</a><a class="" href="chapter2-summary.html">第2章</a><a class="" href="chapter3-summary.html">第3章</a><a class="" href="chapter4-summary.html">第4章</a><a class="" href="chapter5-summary.html">第5章</a><a class="" href="chapter6-summary.html">第6章</a><a class="active" href="chapter7-summary.html">第7章</a>
+    </nav>
+
+    <section class="tool-strip">
+      <label class="search-box">
+        <span>搜索本章</span>
+        <input id="searchInput" type="search" placeholder="输入关键词，如 NAT、Reno、CRC">
+      </label>
+      <button id="toggleUnmastered" type="button">只看未掌握</button>
+      <button id="expandAll" type="button">展开全部</button>
+      <button id="collapseAll" type="button">收起全部</button>
+    </section>
+
+    <section class="meta-grid">
+      <article>
+        <h2>来源</h2>
+        <p>Chapter7-Wireless &amp; Mobile Networks-学生.pdf</p>
+      </article>
+      <article>
+        <h2>作业关联</h2>
+        <ul><li>三次作业未直接覆盖，本章按课件与期末可能填空/选择补足。</li></ul>
+      </article>
+      <article>
+        <h2>期末线索</h2>
+        <ul><li>选择: CSMA/CA 使用 ACK</li><li>概念: 隐藏终端、信号衰减</li><li>过程: RTS/CTS 与 DIFS/SIFS</li></ul>
+      </article>
+    </section>
+
+    <section class="layout">
+      <div class="main-column">
+        
+
+        <h2>知识点总结</h2>
+        
+    <section class="topic-card" data-search="无线与移动网络概述 无线强调通过无线链路通信，移动强调接入点可能变化；无线不一定移动，移动也不只等于无线。 组成要素包括无线主机、基站/AP、无线链路和有线网络基础设施。 无线网络模式包括基础设施模式和自组网/Ad hoc 模式。">
+      <button class="topic-head" type="button" aria-expanded="true">
+        <span>无线与移动网络概述</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body open">
+        <ul><li>无线强调通过无线链路通信，移动强调接入点可能变化；无线不一定移动，移动也不只等于无线。</li><li>组成要素包括无线主机、基站/AP、无线链路和有线网络基础设施。</li><li>无线网络模式包括基础设施模式和自组网/Ad hoc 模式。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="无线链路特性 无线链路相比有线更易受信号强度衰减、干扰和多路径传播影响。 SNR 越高通常 BER 越低；给定 SNR 要选择满足 BER 要求的最高速率调制方式。 隐藏终端问题中两个发送者彼此听不到，但会在接收方处冲突。 信号衰减也会让发送者误以为信道空闲，导致接收方干扰。">
+      <button class="topic-head" type="button" aria-expanded="true">
+        <span>无线链路特性</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body open">
+        <ul><li>无线链路相比有线更易受信号强度衰减、干扰和多路径传播影响。</li><li>SNR 越高通常 BER 越低；给定 SNR 要选择满足 BER 要求的最高速率调制方式。</li><li>隐藏终端问题中两个发送者彼此听不到，但会在接收方处冲突。</li><li>信号衰减也会让发送者误以为信道空闲，导致接收方干扰。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="IEEE 802.11 体系结构 802.11b/g/n/ac/ax 等 Wi-Fi 标准均使用 CSMA/CA，并支持基础设施和自组网模式。 BSS 基本服务集包含无线主机和 AP；AP 连接到分布系统/有线网络。 主机通过扫描信道、发现 SSID/信标、选择 AP、认证和关联接入网络，随后通常通过 DHCP 获得 IP。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>IEEE 802.11 体系结构</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>802.11b/g/n/ac/ax 等 Wi-Fi 标准均使用 CSMA/CA，并支持基础设施和自组网模式。</li><li>BSS 基本服务集包含无线主机和 AP；AP 连接到分布系统/有线网络。</li><li>主机通过扫描信道、发现 SSID/信标、选择 AP、认证和关联接入网络，随后通常通过 DHCP 获得 IP。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="CSMA/CA 与 RTS/CTS 802.11 不能像 CSMA/CD 那样边发送边检测冲突，因为发射信号强、隐藏站和衰落会使冲突检测困难。 发送方监听信道空闲 DIFS 后发送；若忙则随机退避，信道空闲时倒计时，超时后发送。 接收方正确收到数据帧后等待 SIFS 再发送 ACK。 RTS/CTS 通过短控制帧预约信道，CTS 可被邻近节点听到，从而让其他节点推迟发送，减轻隐藏终端影响。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>CSMA/CA 与 RTS/CTS</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>802.11 不能像 CSMA/CD 那样边发送边检测冲突，因为发射信号强、隐藏站和衰落会使冲突检测困难。</li><li>发送方监听信道空闲 DIFS 后发送；若忙则随机退避，信道空闲时倒计时，超时后发送。</li><li>接收方正确收到数据帧后等待 SIFS 再发送 ACK。</li><li>RTS/CTS 通过短控制帧预约信道，CTS 可被邻近节点听到，从而让其他节点推迟发送，减轻隐藏终端影响。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="802.11 帧与移动 802.11 数据帧可有 4 个地址字段，To AP/From AP 决定地址含义。 基础设施网络中去往 AP 时地址 1 为 AP/BSSID，地址 2 为源，地址 3 为目的；来自 AP 时地址 1 为目的，地址 2 为 AP/BSSID，地址 3 为源。 同一 IP 子网内移动时主机 IP 可保持不变，交换机通过自学习更新到达该主机的端口。 速率适应根据 SNR/BER 动态调整调制与速率；功率管理通过信标帧协调休眠与缓存帧。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>802.11 帧与移动</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>802.11 数据帧可有 4 个地址字段，To AP/From AP 决定地址含义。</li><li>基础设施网络中去往 AP 时地址 1 为 AP/BSSID，地址 2 为源，地址 3 为目的；来自 AP 时地址 1 为目的，地址 2 为 AP/BSSID，地址 3 为源。</li><li>同一 IP 子网内移动时主机 IP 可保持不变，交换机通过自学习更新到达该主机的端口。</li><li>速率适应根据 SNR/BER 动态调整调制与速率；功率管理通过信标帧协调休眠与缓存帧。</li></ul>
+      </div>
+    </section>
+  
+    <section class="topic-card" data-search="移动管理与移动 IP 移动管理需要解决移动节点改变接入网络后如何保持可达。 可通过归属网络、外部网络、归属代理、外部代理和转交地址定位移动节点。 移动 IP 的典型思路是归属代理截获发往移动节点归属地址的数据报，再隧道转发到转交地址。 三角路由会导致通信路径不够直接，是移动 IP 的典型效率问题。">
+      <button class="topic-head" type="button" aria-expanded="false">
+        <span>移动管理与移动 IP</span>
+        <span class="chevron">v</span>
+      </button>
+      <div class="topic-body ">
+        <ul><li>移动管理需要解决移动节点改变接入网络后如何保持可达。</li><li>可通过归属网络、外部网络、归属代理、外部代理和转交地址定位移动节点。</li><li>移动 IP 的典型思路是归属代理截获发往移动节点归属地址的数据报，再隧道转发到转交地址。</li><li>三角路由会导致通信路径不够直接，是移动 IP 的典型效率问题。</li></ul>
+      </div>
+    </section>
+  
+
+        <h2>公式与判定</h2>
+        <div class="formula-grid">
+    <article class="formula-card" data-search="CSMA/CA 最快预约过程 DIFS + 3*SIFS 课件例题忽略传播、处理、传输时延。">
+      <div class="formula-name">CSMA/CA 最快预约过程</div>
+      <code>DIFS + 3*SIFS</code>
+      <p>课件例题忽略传播、处理、传输时延。</p>
+    </article>
+  
+    <article class="formula-card" data-search="SNR 与 BER SNR 增大通常 BER 降低 偏概念判断，不是固定公式。">
+      <div class="formula-name">SNR 与 BER</div>
+      <code>SNR 增大通常 BER 降低</code>
+      <p>偏概念判断，不是固定公式。</p>
+    </article>
+  
+    <article class="formula-card" data-search="802.11 退避 忙则随机退避，空闲倒计时，超时发送 过程题写清 DIFS/SIFS/ACK。">
+      <div class="formula-name">802.11 退避</div>
+      <code>忙则随机退避，空闲倒计时，超时发送</code>
+      <p>过程题写清 DIFS/SIFS/ACK。</p>
+    </article>
+  </div>
+
+        <h2>易错点</h2>
+        <div class="warning-box"><ul><li>CSMA/CA 是避免冲突，不是检测冲突；802.11 不使用 CSMA/CD。</li><li>RTS 帧仍可能冲突，但短帧冲突成本低。</li><li>ACK 是 802.11 链路层可靠传输的重要机制，CSMA/CD 没有这种 ACK。</li><li>无线不等于移动，移动不等于一定换 IP；同一子网内漫游 IP 可不变。</li><li>To AP/From AP 两位决定 802.11 帧地址字段解释，不能按以太网帧死记。</li></ul></div>
+
+        <h2>快速自查</h2>
+        <div class="qa-grid">
+    <article class="qa-card" data-search="为什么 802.11 不用 CSMA/CD? 无线发送时难以同时检测弱接收信号，且隐藏站/衰落使冲突不总能被听到。">
+      <button type="button" class="qa-question">为什么 802.11 不用 CSMA/CD?</button>
+      <p class="qa-answer">无线发送时难以同时检测弱接收信号，且隐藏站/衰落使冲突不总能被听到。</p>
+    </article>
+  
+    <article class="qa-card" data-search="RTS/CTS 解决什么问题? 通过预约信道降低长数据帧冲突成本，缓解隐藏终端影响。">
+      <button type="button" class="qa-question">RTS/CTS 解决什么问题?</button>
+      <p class="qa-answer">通过预约信道降低长数据帧冲突成本，缓解隐藏终端影响。</p>
+    </article>
+  
+    <article class="qa-card" data-search="CSMA/CA 中 ACK 前等待什么间隔? SIFS。发送前监听空闲 DIFS。">
+      <button type="button" class="qa-question">CSMA/CA 中 ACK 前等待什么间隔?</button>
+      <p class="qa-answer">SIFS。发送前监听空闲 DIFS。</p>
+    </article>
+  </div>
+      </div>
+
+      <aside class="side-panel">
+        <h2>掌握清单</h2>
+        <div class="checks">
+    <label class="check-row" data-search="能区分无线和移动两个概念。">
+      <input type="checkbox" data-check="0">
+      <span>能区分无线和移动两个概念。</span>
+    </label>
+  
+    <label class="check-row" data-search="能解释路径损耗、干扰、多路径和隐藏终端。">
+      <input type="checkbox" data-check="1">
+      <span>能解释路径损耗、干扰、多路径和隐藏终端。</span>
+    </label>
+  
+    <label class="check-row" data-search="能描述 BSS、AP、SSID、被动/主动扫描。">
+      <input type="checkbox" data-check="2">
+      <span>能描述 BSS、AP、SSID、被动/主动扫描。</span>
+    </label>
+  
+    <label class="check-row" data-search="能写出 CSMA/CA 的 DIFS、退避、数据、SIFS、ACK 流程。">
+      <input type="checkbox" data-check="3">
+      <span>能写出 CSMA/CA 的 DIFS、退避、数据、SIFS、ACK 流程。</span>
+    </label>
+  
+    <label class="check-row" data-search="能说明 RTS/CTS 如何减少隐藏终端问题。">
+      <input type="checkbox" data-check="4">
+      <span>能说明 RTS/CTS 如何减少隐藏终端问题。</span>
+    </label>
+  
+    <label class="check-row" data-search="能判断 802.11 帧地址字段在 To AP/From AP 下的含义。">
+      <input type="checkbox" data-check="5">
+      <span>能判断 802.11 帧地址字段在 To AP/From AP 下的含义。</span>
+    </label>
+  
+    <label class="check-row" data-search="能说出移动 IP 的归属代理、外部代理、转交地址和三角路由。">
+      <input type="checkbox" data-check="6">
+      <span>能说出移动 IP 的归属代理、外部代理、转交地址和三角路由。</span>
+    </label>
+  </div>
+        <h2>我的补充</h2>
+        <textarea id="notes" placeholder="把你根据作业补充的题型、错因或例题写在这里。"></textarea>
+        <button id="copySummary" type="button">复制复习清单</button>
+        <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+const key = document.body.dataset.storage || "network-review";
+const state = JSON.parse(localStorage.getItem(key) || "{}");
+const checks = [...document.querySelectorAll("[data-check]")];
+const notes = document.getElementById("notes");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+let onlyUnmastered = false;
+
+function save() {
+  const mastered = checks.map((input) => input.checked);
+  localStorage.setItem(key, JSON.stringify({ mastered, notes: notes?.value || "" }));
+}
+
+function updateProgress() {
+  const done = checks.filter((input) => input.checked).length;
+  const total = checks.length || 1;
+  const percent = Math.round((done / total) * 100);
+  if (progressText) progressText.textContent = percent + "%";
+  if (progressBar) progressBar.style.width = percent + "%";
+  checks.forEach((input) => {
+    const row = input.closest(".check-row");
+    row?.classList.toggle("mastered", input.checked);
+    if (onlyUnmastered) row.hidden = input.checked;
+  });
+}
+
+checks.forEach((input, index) => {
+  input.checked = Boolean(state.mastered?.[index]);
+  input.addEventListener("change", () => {
+    save();
+    updateProgress();
+  });
+});
+if (notes) {
+  notes.value = state.notes || "";
+  notes.addEventListener("input", save);
+}
+updateProgress();
+
+document.querySelectorAll(".topic-head").forEach((button) => {
+  button.addEventListener("click", () => {
+    const body = button.parentElement.querySelector(".topic-body");
+    const isOpen = body.classList.toggle("open");
+    button.setAttribute("aria-expanded", String(isOpen));
+  });
+});
+
+document.querySelectorAll(".qa-question").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.parentElement.querySelector(".qa-answer")?.classList.toggle("open");
+  });
+});
+
+document.getElementById("expandAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.add("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "true"));
+});
+
+document.getElementById("collapseAll")?.addEventListener("click", () => {
+  document.querySelectorAll(".topic-body").forEach((body) => body.classList.remove("open"));
+  document.querySelectorAll(".topic-head").forEach((button) => button.setAttribute("aria-expanded", "false"));
+});
+
+document.getElementById("toggleUnmastered")?.addEventListener("click", (event) => {
+  onlyUnmastered = !onlyUnmastered;
+  event.currentTarget.classList.toggle("active", onlyUnmastered);
+  updateProgress();
+});
+
+document.getElementById("searchInput")?.addEventListener("input", (event) => {
+  const q = event.target.value.trim().toLowerCase();
+  document.querySelectorAll("[data-search]").forEach((node) => {
+    node.hidden = q && !node.dataset.search.toLowerCase().includes(q);
+  });
+});
+
+document.getElementById("copySummary")?.addEventListener("click", async () => {
+  const pending = checks
+    .filter((input) => !input.checked)
+    .map((input) => "- " + input.closest(".check-row").innerText.trim())
+    .join("\n");
+  const text = [
+    document.querySelector("h1")?.innerText || "计算机网络复习",
+    "",
+    "未掌握清单:",
+    pending || "- 已全部勾选",
+    "",
+    "我的补充:",
+    notes?.value || ""
+  ].join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById("copyStatus").textContent = "已复制到剪贴板。";
+  } catch {
+    document.getElementById("copyStatus").textContent = "浏览器限制复制，请手动选择文本。";
+  }
+});
+</script>
+</body>
+</html>
